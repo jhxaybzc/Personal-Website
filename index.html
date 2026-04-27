@@ -1,261 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeremy — Terminal</title>
-    <style>
-        body {
-            background-image: url('https://i.ibb.co/SXFw3qJ7/Screenshot-2026-04-27-at-3-56-55-PM.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .mac-window {
-            width: 1000px;
-            height: 80vh;
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .title-bar {
-            background-color: #333333;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #000;
-            flex-shrink: 0;
-        }
-
-        .traffic-lights {
-            display: flex;
-            gap: 8px;
-            margin-right: 20px;
-        }
-
-        .traffic-light {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 0.5px solid rgba(0,0,0,0.1);
-        }
-        .close { background-color: #ff5f56; }
-        .minimize { background-color: #ffbd2e; }
-        .maximize { background-color: #27c93f; }
-
-        .window-title {
-            flex-grow: 1;
-            text-align: center;
-            color: #999;
-            font-family: -apple-system, sans-serif;
-            font-size: 13px;
-            margin-right: 52px;
-            font-weight: 500;
-        }
-
-        .terminal-body {
-            flex-grow: 1;
-            padding: 10px 20px 20px 20px;
-            overflow-y: auto;
-            color: #bbbbbb;
-            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .terminal-body::-webkit-scrollbar { width: 8px; }
-        .terminal-body::-webkit-scrollbar-track { background: #1e1e1e; }
-        .terminal-body::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
-
-        h1.title {
-            color: #ffffff;
-            font-size: 14px;
-            margin-top: 20px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        h1:not(.title) {
-            margin-top: 20px;
-            margin-bottom: 5px;
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: normal;
-        }
-
-        h1:not(.title)::before {
-            content: "jeremyh@MacBook-Pro : ~ $ ";
-            color: #36d7b7;
-        }
-
-        h2 {
-            color: #ffffff;
-            font-size: 13px;
-            margin-top: 10px;
-            margin-bottom: 3px;
-            font-weight: normal;
-        }
-
-        p { margin: 0 0 5px 0; color: #e0e0e0; }
-
-        ul, ol { margin: 0 0 15px 20px; padding: 0; color: #e0e0e0; }
-        li { margin-bottom: 2px; }
-
-        a { color: #36d7b7; text-decoration: none; cursor: pointer; }
-        a:hover { text-decoration: underline; }
-
-        hr { border: 0; border-bottom: 1px dashed #555; margin: 15px 0; }
-
-        .prompt-area { margin-top: 10px; display: flex; color: #fff; }
-        .prompt-user { color: #36d7b7; font-weight: bold; }
-        .prompt-at { color: #888; }
-        .prompt-dir { color: #ffbd2e; font-weight: bold; }
-
-        .cursor-block {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background-color: #bbbbbb;
-            vertical-align: middle;
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000}
+body{
+  font-family:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
+  color:#e5e5e5;font-size:13px;line-height:1.55;
+}
+#term{
+  height:100%;padding:12px 14px;overflow-y:auto;
+  white-space:pre-wrap;word-break:break-all;
+  scrollbar-width:thin;scrollbar-color:#333 transparent;
+}
+#term::-webkit-scrollbar{width:6px}
+#term::-webkit-scrollbar-track{background:transparent}
+#term::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.irow{line-height:1.55}
+.cur{display:inline;animation:blink 1s step-end infinite}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.dim{opacity:.45}
+.bld{color:#5af78e}
+.blu{color:#57c7ff}
+.yel{color:#f3f99d}
+.red{color:#ff3333}
+.cyn{color:#9aedfe}
+.mgn{color:#d6acff}
+.org{color:#ff6ac1}
+.okg{color:#5af78e}
+.b{font-weight:700}
+#hinp{position:fixed;left:-9999px;opacity:0;font-family:inherit;font-size:13px}
+.hbtn{
+  position:fixed;bottom:16px;right:16px;width:28px;height:28px;border-radius:50%;
+  border:1px solid #3a3a3a;background:rgba(8,8,8,.88);color:#555;
+  font-size:13px;font-family:inherit;cursor:pointer;z-index:20;
+  display:none;align-items:center;justify-content:center;
+  transition:border-color .2s,color .2s;line-height:1;padding:0;
+}
+.hbtn:hover{border-color:#777;color:#bbb}
+.hbtn.on{border-color:#57c7ff;color:#57c7ff}
+.guide{
+  position:fixed;bottom:52px;right:16px;width:310px;max-height:72vh;
+  background:#0a0a0a;border:1px solid #252525;border-radius:8px;
+  padding:14px 16px;overflow-y:auto;z-index:15;
+  font-size:11.5px;line-height:1.7;
+  scrollbar-width:thin;scrollbar-color:#333 transparent;display:none;
+}
+.guide::-webkit-scrollbar{width:4px}
+.guide::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.gc{color:#57c7ff;font-weight:700;margin-top:10px}
+.gc:first-child{margin-top:0}
+.gcmd{color:#5af78e}
+.gd{color:#777}
+.gsep{color:#222;margin:6px 0 2px}
+.gtip{color:#555}
+@media(max-width:640px){
+  #term{font-size:12px;padding:8px 10px}
+  .guide{width:calc(100vw - 32px);right:16px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.cur{animation:none;opacity:1}}
+</style>
 </head>
 <body>
-    <div class="mac-window">
-        <div class="title-bar">
-            <div class="traffic-lights">
-                <div class="traffic-light close"></div>
-                <div class="traffic-light minimize"></div>
-                <div class="traffic-light maximize"></div>
-            </div>
-            <div class="window-title">jeremyh — 80x24</div>
-        </div>
 
-        <div class="terminal-body">
-            <p>Last login: <span id="currentTime"></span> on ttys000</p>
-            <br>
+<div id="term"></div>
+<input type="text" id="hinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input">
 
-            <h1 class="title">Hello, welcome to my personal website.</h1>
+<button class="hbtn" id="hbtn" aria-label="Command guide">?</button>
 
-            <h1>Questions</h1>
-            <h2>Who made this?</h2>
-            <p>It was made by me, a 13 year old, Jeremy.</p>
-            
-            <h2>Why did you make this?</h2>
-            <p>I was bored.</p>
-            
-            <h2>How can i contact you?</h2>
-            <p>By emailing: jeremyh@jeremyh.me</p>
-            
-            <h2>Why does this website look so bad?</h2>
-            <p>I coded it my self in 2 minutes.</p>
+<div class="guide" id="guide">
+  <div class="gc">PORTFOLIO</div>
+  <div><span class="gcmd">about</span> <span class="gd">Who I am</span></div>
+  <div><span class="gcmd">skills</span> <span class="gd">Technical skills</span></div>
+  <div><span class="gcmd">projects</span> <span class="gd">Things I've built</span></div>
+  <div><span class="gcmd">experience</span> <span class="gd">Work history</span></div>
+  <div><span class="gcmd">contact</span> <span class="gd">Get in touch</span></div>
+  <div class="gc">FILESYSTEM</div>
+  <div><span class="gcmd">ls [-a]</span> <span class="gd">List files (-a shows hidden)</span></div>
+  <div><span class="gcmd">cd &lt;dir&gt;</span> <span class="gd">Change directory</span></div>
+  <div><span class="gcmd">cat &lt;file&gt;</span> <span class="gd">Read file contents</span></div>
+  <div><span class="gcmd">pwd</span> <span class="gd">Print working directory</span></div>
+  <div class="gc">SYSTEM</div>
+  <div><span class="gcmd">neofetch</span> <span class="gd">System info + logo</span></div>
+  <div><span class="gcmd">uname [-a]</span> <span class="gd">System name</span></div>
+  <div><span class="gcmd">uptime</span> <span class="gd">Uptime info</span></div>
+  <div><span class="gcmd">date</span> <span class="gd">Current date &amp; time</span></div>
+  <div><span class="gcmd">whoami</span> <span class="gd">Current user</span></div>
+  <div class="gc">UTILITY</div>
+  <div><span class="gcmd">echo &lt;text&gt;</span> <span class="gd">Print text</span></div>
+  <div><span class="gcmd">history</span> <span class="gd">Past commands</span></div>
+  <div><span class="gcmd">clear</span> <span class="gd">Clear screen (also Ctrl+L)</span></div>
+  <div><span class="gcmd">exit</span> <span class="gd">Close terminal</span></div>
+  <div class="gc">FUN</div>
+  <div><span class="gcmd">hack</span> <span class="gd">???</span></div>
+  <div><span class="gcmd">coffee</span> <span class="gd">Brew a cup</span></div>
+  <div><span class="gcmd">sudo</span> <span class="gd">Try it</span></div>
+  <div class="gsep">───────────────────────────</div>
+  <div class="gtip">Tab to autocomplete commands &amp; paths</div>
+  <div class="gtip">Up / Down arrows to browse history</div>
+  <div class="gtip">Try: ls -a  then  cd .secrets  then  cat diary.md</div>
+</div>
 
-            <hr>
+<script>
+// ============================================================
+//  PERSONAL CONFIG — EDIT THIS
+// ============================================================
+const C = {
+  name: 'Your Name',
+  username: 'user',
+  hostname: 'MacBook-Air',
+  location: 'Somewhere, Earth',
+  email: 'you@example.com',
+  github: 'github.com/you',
+  linkedin: 'linkedin.com/in/you',
+  twitter: 'twitter.com/you',
+  website: 'yoursite.com',
+  bio: 'I build things for the web. I care about craft and making things that feel alive. Currently doing [your current thing]. Always learning, always shipping.',
+  skills: [
+    { cat: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go'] },
+    { cat: 'Frontend', items: ['React', 'Vue', 'Next.js', 'Three.js', 'Tailwind'] },
+    { cat: 'Backend', items: ['Node.js', 'PostgreSQL', 'Redis', 'Docker', 'AWS'] },
+    { cat: 'Creative', items: ['Figma', 'Blender', 'After Effects', 'TouchDesigner'] },
+  ],
+  experience: [
+    { role: 'Senior Developer', co: 'Company Name', period: '2022 — Present',
+      desc: 'Leading frontend architecture. Shipped [achievement]. Reduced load times by [X]%.' },
+    { role: 'Developer', co: 'Previous Company', period: '2020 — 2022',
+      desc: 'Built [thing] used by [number] people. Led migration from [old] to [new].' },
+    { role: 'Junior Developer', co: 'First Company', period: '2018 — 2020',
+      desc: 'Started here. Built internal tools and customer-facing features.' },
+  ],
+  projects: [
+    { name: 'Project One', desc: 'A thing I built that does something cool.', tech: ['React', 'Node.js', 'PostgreSQL'], link: '#' },
+    { name: 'Project Two', desc: 'An experiment in creative coding.', tech: ['Three.js', 'GLSL', 'WebGL'], link: '#' },
+    { name: 'Project Three', desc: 'Open source tool that solves a real problem.', tech: ['Rust', 'WASM', 'TypeScript'], link: '#' },
+    { name: 'Project Four', desc: 'A side project that got way out of hand.', tech: ['Python', 'FastAPI', 'Redis'], link: '#' },
+  ],
+  diary: 'Day 1: Finally got the terminal portfolio working.\n       Only took me 47 attempts.\n\nDay 2: Someone found the hidden directory.\n       If you\'re reading this, congratulations.\n       You\'re exactly the kind of curious person\n       I\'d want to work with.\n\nDay 3: *redacted*',
+};
 
-            <h1>Current Status</h1>
-            <p>Sleeping</p>
+// ============================================================
+//  UTILITIES
+// ============================================================
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pad = (s, n, c = ' ') => { while (s.length < n) s += c; return s; };
+const startTime = Date.now();
+function uptime() {
+  const s = Math.floor((Date.now() - startTime) / 1000);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` : `${m}:${String(sec).padStart(2,'0')}`;
+}
 
-            <h1>Location</h1>
-            <p>Miami, Florida, United States of America, Earth, Solar System.......</p>
+// ============================================================
+//  HELP BUTTON
+// ============================================================
+const hbtn = $('#hbtn');
+const guide = $('#guide');
+let guideOpen = false;
 
-            <h1>Interests</h1>
-            <p>I am not telling you.</p>
+hbtn.addEventListener('click', e => {
+  e.stopPropagation();
+  guideOpen = !guideOpen;
+  guide.style.display = guideOpen ? 'block' : 'none';
+  hbtn.classList.toggle('on', guideOpen);
+});
 
-            <hr>
+document.addEventListener('click', e => {
+  if (guideOpen && !guide.contains(e.target)) {
+    guideOpen = false;
+    guide.style.display = 'none';
+    hbtn.classList.remove('on');
+  }
+});
 
-            <h1>Dreams</h1>
-            <ul>
-                <li>Get into good college, MIT, Harvard, Stanford, Rice, Columbia, Princeton, Dartmouth, Brown, etc................</li>
-                <li>Qualify and do good on AIME.</li>
-                <li>Sleep well.</li>
-            </ul>
-            <ul></ul>
+// ============================================================
+//  BOOT SEQUENCE
+// ============================================================
+const kernelLines = [
+  '[    0.000000] Linux version 6.5.0-44-generic (buildd@lcy02-amd64-045) (x86_64-linux-gnu-gcc-12 12.3.0) #44~22.04.1-Ubuntu SMP',
+  '[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-6.5.0-44-generic root=/dev/mapper/vgubuntu-root ro quiet splash',
+  '[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable',
+  '[    0.008023] ACPI: RSDP 0x00000000000F5A00 000024 (v02)',
+  '[    0.008045] ACPI: XSDT 0x00000000BF7E1A98 00003C (v01)',
+  '[    0.032187] Initializing cgroup subsys cpuset',
+  '[    0.032189] Initializing cgroup subsys cpu',
+  '[    0.056023] CPU: AMD Ryzen 7 7800X3D 8-Core Processor',
+  '[    0.056234] x86/fpu: x87 FPU on chip',
+  '[    0.120043] PCI: Using configuration type 1',
+  '[    0.180324] clocksource: tsc: mask: 0xffffffffffffffff',
+  '[    0.240001] Calibrating delay loop (skipped).. 7200.00 BogoMIPS',
+  '[    0.360012] Memory: 16384000K/16777216K available',
+  '[    0.480023] NET: Registered PF_NETLINK/PF_ROUTE protocol',
+  '[    0.540032] pci 0000:01:00.0: [10DE:2620] NVIDIA Corporation',
+  '[    0.600012] usb 1-1: new high-speed USB device using xhci_hcd',
+  '[    0.720034] EXT4-fs (dm-0): mounted filesystem with ordered data mode',
+];
 
-            <h1>Favorite things</h1>
-            <ol>
-                <li>Anthropic Claude</li>
-                <li>Violin</li>
-                <li>My bed.</li>
-                <li>My friend, Caden D.</li>
-            </ol>
+const systemdLines = [
+  'Started Journal Service',
+  'Started D-Bus System Message Bus',
+  'Starting Network Manager',
+  'Started Network Manager',
+  'Reached target Network',
+  'Starting OpenSSH Daemon',
+  'Started OpenSSH Daemon',
+  'Reached target Multi-User System',
+  'Started Getty on tty1',
+];
 
-            <hr>
+async function bootSequence() {
+  const term = $('#term');
 
-            <h1>Extra stuff</h1>
-            <ul>
-                <li><a href="https://artofproblemsolving.com" target="_blank">AoPS</a></li>
-                <li><a href="https://www.theholyrosary.org" target="_blank">?</a></li>
-            </ul>
+  // Kernel lines — fast
+  for (const line of kernelLines) {
+    const d = document.createElement('div');
+    d.className = 'dim';
+    d.textContent = line;
+    term.appendChild(d);
+    term.scrollTop = term.scrollHeight;
+    await sleep(28 + Math.random() * 22);
+  }
 
-            <h1>Friend tier list</h1>
-            <ol>
-                <li>Caden D.</li>
-                <li>Leonardo H.</li>
-                <li>Claude</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>Redacted</li>
-                <li>John Anthony</li>
-            </ol>
+  // Systemd lines — slightly slower, with green [  OK  ]
+  for (const line of systemdLines) {
+    const d = document.createElement('div');
+    d.innerHTML = '<span class="okg">[  OK  ]</span> ' + line;
+    term.appendChild(d);
+    term.scrollTop = term.scrollHeight;
+    await sleep(45 + Math.random() * 30);
+  }
 
-            <p style="color: #999;">You might be asking why John Anthony is so low down the list...John Anthony if you are reading this, you have not spoken to me in 231346234623462 years.</p>
-            <br>
-            <p style="color: #999;">I am so lonely...Please email me. :-[</p>
+  // Blank line
+  const blank = document.createElement('div');
+  blank.textContent = '';
+  term.appendChild(blank);
+  await sleep(350);
 
-            <br>
-            <div class="prompt-area">
-                <span class="prompt-user">jeremyh@MacBook-Pro</span>
-                <span class="prompt-at">:</span>
-                <span class="prompt-dir">~</span>
-                <span class="prompt-at">$</span>
-                <span class="cursor-block"></span>
-            </div>
+  // "Last login" line
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr = `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const login = document.createElement('div');
+  login.className = 'dim';
+  login.textContent = `Last login: ${dateStr} on ttys000`;
+  term.appendChild(login);
 
-            <small>Copyright Jeremy H. 2026</small>
-        </div>
-    </div>
+  await sleep(200);
 
-    <script>
-        function updateTime() {
-            const now = new Date();
-            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById('currentTime').innerText = now.toLocaleTimeString('en-US', options);
-        }
-        updateTime();
-        setInterval(updateTime, 1000);
-    </script>
-    <!-- Hello, looks like you understand code, since you made it all the way over here. Please email my personal email: realemail.outbound806@slmail.me -->
+  // Show help button
+  hbtn.style.display = 'flex';
+
+  // Start terminal
+  t.init();
+}
+
+// ============================================================
+//  TERMINAL
+// ============================================================
+const hinp = $('#hinp');
+const term = $('#term');
+
+const t = {
+  hist: [], hidx: -1, input: '', busy: false, inputRow: null,
+  dir: '/Users/' + C.username,
+
+  fs: {
+    ['/Users/' + C.username]: { type: 'dir', children: ['Desktop', 'Documents', 'Downloads', 'about.md', 'skills.md', 'contact.md', 'experience.md', 'projects', '.secrets'] },
+    ['/Users/' + C.username + '/projects']: { type: 'dir', children: C.projects.map((_, i) => `project${i+1}.md`) },
+    ['/Users/' + C.username + '/Desktop']: { type: 'dir', children: [] },
+    ['/Users/' + C.username + '/Documents']: { type: 'dir', children: ['resume.pdf', 'notes.txt'] },
+    ['/Users/' + C.username + '/Downloads']: { type: 'dir', children: [] },
+    ['/Users/' + C.username + '/.secrets']: { type: 'dir', children: ['diary.md'] },
+  },
+
+  resolve(base, target) {
+    if (!target) return base;
+    if (target === '~') return '/Users/' + C.username;
+    if (target.startsWith('~/')) target = '/Users/' + C.username + '/' + target.slice(2);
+    if (!target.startsWith('/')) target = (base === '/' ? '' : base) + '/' + target;
+    const parts = target.split('/').filter(Boolean), out = [];
+    for (const p of parts) { if (p === '..') out.pop(); else if (p !== '.') out.push(p); }
+    return '/' + out.join('/') || '/';
+  },
+
+  contents(path) { const d = this.fs[path]; return d && d.type === 'dir' ? d.children : null; },
+
+  prompt() {
+    let p = this.dir;
+    if (p.startsWith('/Users/' + C.username)) p = '~' + p.slice(('/Users/' + C.username).length);
+    if (!p) p = '~';
+    return `${C.username}@${C.hostname} ${p} % `;
+  },
+
+  add(text, cls = '', html = false) {
+    const d = document.createElement('div');
+    d.className = cls;
+    if (html) d.innerHTML = text; else d.textContent = text;
+    term.appendChild(d);
+    term.scrollTop = term.scrollHeight;
+    return d;
+  },
+
+  mkInput() {
+    if (this.inputRow) this.inputRow.remove();
+    const row = document.createElement('div');
+    row.className = 'irow';
+    row.innerHTML = `<span>${this.prompt()}</span><span class="il"></span><span class="cur">█</span>`;
+    term.appendChild(row);
+    this.inputRow = row;
+    term.scrollTop = term.scrollHeight;
+  },
+
+  rmInput() { if (this.inputRow) { this.inputRow.remove(); this.inputRow = null; } },
+
+  showInput() {
+    if (!this.inputRow) return;
+    this.inputRow.querySelector('.il').textContent = this.input;
+    term.scrollTop = term.scrollHeight;
+  },
+
+  init() {
+    this.mkInput();
+
+    document.addEventListener('click', () => {
+      if (!t.busy) hinp.focus();
+    });
+
+    hinp.addEventListener('input', () => { t.input = hinp.value; t.showInput(); });
+    hinp.addEventListener('keydown', e => this.onKey(e));
+    hinp.focus();
+  },
+
+  onKey(e) {
+    if (this.busy) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const cmd = this.input.trim();
+      this.rmInput();
+      if (cmd) {
+        this.add(this.prompt() + cmd);
+        this.hist.push(cmd); this.hidx = -1;
+        this.run(cmd);
+      } else { this.mkInput(); }
+      this.input = ''; hinp.value = '';
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (this.hist.length && this.hidx < this.hist.length - 1) {
+        this.hidx++;
+        this.input = this.hist[this.hist.length - 1 - this.hidx];
+        hinp.value = this.input; this.showInput();
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (this.hidx > 0) { this.hidx--; this.input = this.hist[this.hist.length - 1 - this.hidx]; }
+      else { this.hidx = -1; this.input = ''; }
+      hinp.value = this.input; this.showInput();
+    } else if (e.key === 'Tab') {
+      e.preventDefault(); this.tab();
+    } else if (e.key === 'l' && e.ctrlKey) {
+      e.preventDefault(); this.rmInput(); term.innerHTML = ''; this.mkInput();
+      this.input = ''; hinp.value = '';
+    }
+  },
+
+  tab() {
+    const parts = this.input.split(' ');
+    if (parts.length <= 1) {
+      const partial = parts[0] || '';
+      const cmds = ['help','clear','about','skills','projects','contact','experience','whoami','pwd','ls','cd','cat','neofetch','date','echo','history','uname','uptime','sudo','hack','coffee','exit'];
+      const m = cmds.filter(c => c.startsWith(partial));
+      if (m.length === 1) { this.input = m[0] + ' '; hinp.value = this.input; this.showInput(); }
+      else if (m.length > 1) this.add(m.join('  '), 'dim');
+    } else {
+      const partial = parts[parts.length - 1];
+      const entries = this.contents(this.dir) || [];
+      const m = entries.filter(e => e.startsWith(partial));
+      if (m.length === 1) {
+        parts[parts.length - 1] = m[0];
+        const node = this.fs[this.resolve(this.dir, m[0])];
+        if (node && node.type === 'dir') parts[parts.length - 1] += '/';
+        this.input = parts.join(' ') + ' '; hinp.value = this.input; this.showInput();
+      } else if (m.length > 1) this.add(m.join('  '), 'dim');
+    }
+  },
+
+  async run(raw) {
+    const parts = raw.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+    this.busy = true;
+
+    switch (cmd) {
+      case 'help': this.cmdHelp(); break;
+      case 'clear': term.innerHTML = ''; break;
+      case 'about': this.cmdAbout(); break;
+      case 'skills': this.cmdSkills(); break;
+      case 'projects': this.cmdProjects(); break;
+      case 'contact': this.cmdContact(); break;
+      case 'experience': this.cmdExperience(); break;
+      case 'whoami': this.add(C.username); break;
+      case 'pwd': this.add(this.dir); break;
+      case 'ls': this.cmdLs(args); break;
+      case 'cd': this.cmdCd(args); break;
+      case 'cat': this.cmdCat(args); break;
+      case 'neofetch': this.cmdNeofetch(); break;
+      case 'date': this.add(new Date().toString()); break;
+      case 'echo': this.add(args.join(' ')); break;
+      case 'history': this.hist.forEach((h, i) => this.add(`  ${pad(String(i+1), 5)}${h}`, 'dim')); break;
+      case 'uname': this.add(args.includes('-a') ? 'Darwin PortalOS 23.4.0 Darwin Kernel Version 23.4.0 x86_64' : 'Darwin'); break;
+      case 'uptime': this.add(` ${new Date().toLocaleTimeString()}  up ${uptime()}, 1 user, load averages: 1.23 1.45 1.67`); break;
+      case 'sudo': await this.cmdSudo(); break;
+      case 'hack': await this.cmdHack(); break;
+      case 'coffee': this.cmdCoffee(); break;
+      case 'exit': await this.cmdExit(); return;
+      default: this.add(`zsh: command not found: ${cmd}`, 'red');
+    }
+    this.busy = false;
+    if (cmd !== 'clear' && cmd !== 'exit') this.mkInput();
+  },
+
+  // ---- COMMANDS ----
+
+  cmdHelp() {
+    const cmds = [
+      ['about',       'Who I am'],
+      ['skills',      'Technical skills'],
+      ['projects',    'Things I\'ve built'],
+      ['contact',     'Get in touch'],
+      ['experience',  'Work history'],
+      ['neofetch',    'System info'],
+      ['ls',          'List files'],
+      ['cd <dir>',    'Change directory'],
+      ['cat <file>',  'Read a file'],
+      ['pwd',         'Print working directory'],
+      ['echo <text>', 'Print text'],
+      ['history',     'Command history'],
+      ['date',        'Current date/time'],
+      ['uname [-a]',  'System name'],
+      ['uptime',      'System uptime'],
+      ['clear',       'Clear screen (also Ctrl+L)'],
+      ['hack',        '???'],
+      ['coffee',      'Brew a cup'],
+      ['sudo',        'Try it'],
+      ['exit',        'Close terminal'],
+    ];
+    this.add('');
+    for (const [c, d] of cmds) this.add(`  ${pad(c, 16)}${d}`);
+    this.add('');
+    this.add('  Navigate the filesystem with ls, cd, cat. Tab completes.', 'dim');
+    this.add('');
+  },
+
+  cmdAbout() {
+    this.add('');
+    this.add(C.name, 'bld b');
+    this.add(C.location, 'dim');
+    this.add('');
+    this.add(C.bio);
+    this.add('');
+  },
+
+  cmdSkills() {
+    this.add('');
+    for (const s of C.skills) {
+      this.add(`  ${s.cat}`, 'yel b');
+      s.items.forEach(i => this.add(`    ${i}`, 'bld'));
+      this.add('');
+    }
+  },
+
+  cmdProjects() {
+    this.add('');
+    C.projects.forEach((p, i) => {
+      this.add(`  ${i+1}. ${p.name}`, 'blu b');
+      this.add(`     ${p.desc}`);
+      this.add(`     ${p.tech.join(', ')}`, 'dim');
+      if (p.link && p.link !== '#') this.add(`     ${p.link}`, 'cyn');
+      this.add('');
+    });
+    this.add('  cd projects/ and cat files for details.', 'dim');
+    this.add('');
+  },
+
+  cmdContact() {
+    this.add('');
+    this.add(`  Email    ${C.email}`, 'bld');
+    this.add(`  GitHub   ${C.github}`, 'blu');
+    if (C.linkedin) this.add(`  LinkedIn ${C.linkedin}`, 'blu');
+    if (C.twitter) this.add(`  Twitter  ${C.twitter}`, 'blu');
+    if (C.website) this.add(`  Web      ${C.website}`, 'blu');
+    this.add('');
+  },
+
+  cmdExperience() {
+    this.add('');
+    C.experience.forEach(e => {
+      this.add(`  ${e.role}  @  ${e.co}`, 'yel b');
+      this.add(`  ${e.period}`, 'dim');
+      this.add(`  ${e.desc}`);
+      this.add('');
+    });
+  },
+
+  cmdLs(args) {
+    const showAll = args.some(a => a === '-a' || a === '-la' || a === '-al');
+    const target = args.find(a => !a.startsWith('-'));
+    let path = this.dir;
+    if (target) path = this.resolve(this.dir, target);
+    const entries = this.contents(path);
+    if (!entries) { this.add(`ls: ${target || path}: No such file or directory`, 'red'); return; }
+    let filtered = showAll ? entries : entries.filter(e => !e.startsWith('.'));
+    if (!filtered.length) return;
+    const colored = filtered.map(e => {
+      const full = this.resolve(path, e);
+      const node = this.fs[full];
+      return node && node.type === 'dir' ? `<span class="blu">${e}</span>` : `<span>${e}</span>`;
+    });
+    this.add(colored.join('  '), '', true);
+  },
+
+  cmdCd(args) {
+    const target = args[0] || '~';
+    const path = this.resolve(this.dir, target);
+    const node = this.fs[path];
+    if (!node) { this.add(`cd: no such file or directory: ${target}`, 'red'); return; }
+    if (node.type !== 'dir') { this.add(`cd: not a directory: ${target}`, 'red'); return; }
+    this.dir = path;
+  },
+
+  cmdCat(args) {
+    if (!args[0]) { this.add('cat: missing file operand', 'red'); return; }
+    const path = this.resolve(this.dir, args[0]);
+    const node = this.fs[path];
+    if (!node) { this.add(`cat: ${args[0]}: No such file or directory`, 'red'); return; }
+    if (node.type === 'dir') { this.add(`cat: ${args[0]}: Is a directory`, 'red'); return; }
+
+    const base = path.split('/').pop();
+    let content = '';
+    if (base === 'about.md') content = `# ${C.name}\n\n${C.bio}\n\nLocation: ${C.location}`;
+    else if (base === 'skills.md') content = C.skills.map(s => `## ${s.cat}\n${s.items.map(i => '- ' + i).join('\n')}`).join('\n\n');
+    else if (base === 'contact.md') content = `Email: ${C.email}\nGitHub: ${C.github}\n${C.linkedin ? 'LinkedIn: ' + C.linkedin : ''}\n${C.twitter ? 'Twitter: ' + C.twitter : ''}`;
+    else if (base === 'experience.md') content = C.experience.map(e => `## ${e.role} @ ${e.co}\n*${e.period}*\n${e.desc}`).join('\n\n---\n\n');
+    else if (base.startsWith('project') && base.endsWith('.md')) {
+      const idx = parseInt(base.match(/\d+/)[0]) - 1;
+      const p = C.projects[idx];
+      if (p) content = `# ${p.name}\n\n${p.desc}\n\n**Tech:** ${p.tech.join(', ')}\n${p.link && p.link !== '#' ? '**Link:** ' + p.link : ''}`;
+    } else if (base === 'diary.md') content = C.diary;
+    else if (base === 'notes.txt') content = 'TODO: Update portfolio\nTODO: Add more projects\nTODO: Stop procrastinating';
+    else if (base === 'resume.pdf') { this.add(`cat: ${args[0]}: binary file (use a PDF viewer)`, 'red'); return; }
+    else content = '';
+
+    if (content) { this.add(''); content.split('\n').forEach(l => this.add(l)); this.add(''); }
+  },
+
+  cmdNeofetch() {
+    const art = [
+      '                 \'c.          ',
+      '              ,xNMM.          ',
+      '            .OMMMMo           ',
+      '            OMMM0,            ',
+      '  .;loddo:\' loolloddol;.     ',
+      'cKMMMMMMMMMMNWMMMMMMMMMM0:    ',
+      '.KMMMMMMMMMMMMMMMMMMMMMMMWd.  ',
+      'XMMMMMMMMMMMMMMMMMMMMMMMX.    ',
+      ';MMMMMMMMMMMMMMMMMMMMMMMM:     ',
+      ':MMMMMMMMMMMMMMMMMMMMMMMM:     ',
+      '.MMMMMMMMMMMMMMMMMMMMMMMMX.    ',
+      ' kMMMMMMMMMMMMMMMMMMMMMMMMWd.  ',
+      ' .XMMMMMMMMMMMMMMMMMMMMMMMMk   ',
+      '  .XMMMMMMMMMMMMMMMMMMMMK.    ',
+      '    kMMMMMMMMMMMMMMMMMMd       ',
+      '     ;KMMMMMMMWXXWMMMKo.      ',
+    ];
+    const info = [
+      `<span class="bld b">${C.username}@${C.hostname}</span>`,
+      `<span class="dim">──────────────────</span>`,
+      `<span class="bld">OS</span>          macOS 14.4 arm64`,
+      `<span class="bld">Host</span>        MacBook Air (M2)`,
+      `<span class="bld">Kernel</span>      23.4.0`,
+      `<span class="bld">Shell</span>       zsh 5.9`,
+      `<span class="bld">Terminal</span>    PortalTerm`,
+      `<span class="bld">Resolution</span>  ${innerWidth}x${innerHeight}`,
+      `<span class="bld">Uptime</span>      ${uptime()}`,
+      ``,
+      `<span style="color:#ff5f57">██</span><span style="color:#febc2e">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span>`,
+    ];
+    this.add('');
+    for (let i = 0; i < Math.max(art.length, info.length); i++) {
+      const a = i < art.length ? art[i] : '                           ';
+      const inf = i < info.length ? info[i] : '';
+      this.add(`${a}  ${inf}`, '', true);
+    }
+    this.add('');
+  },
+
+  async cmdSudo() {
+    this.add('');
+    this.add('Password:', 'yel');
+    await sleep(600);
+    this.add('Sorry, try again.', 'red');
+    this.add('sudo: 3 incorrect password attempts', 'red');
+    this.add('');
+  },
+
+  async cmdHack() {
+    this.rmInput();
+    const steps = ['SCANNING PORTS','BYPASSING FIREWALL','DECRYPTING','ACCESSING MAINFRAME'];
+    for (const step of steps) {
+      for (let i = 0; i <= 24; i++) {
+        const bar = '█'.repeat(i) + '░'.repeat(24 - i);
+        const pct = String(Math.round(i / 24 * 100)).padStart(3);
+        const d = document.createElement('div');
+        d.className = 'yel';
+        d.textContent = `${step}  [${bar}] ${pct}%`;
+        term.appendChild(d);
+        term.scrollTop = term.scrollHeight;
+        await sleep(12 + Math.random() * 20);
+        if (i < 24) term.removeChild(d);
+      }
+      // Replace last with OK version
+      const last = term.lastElementChild;
+      if (last) last.innerHTML = `${step}  <span class="bld">OK</span>`;
+      await sleep(80);
+    }
+    this.add('');
+    this.add('Just kidding. This is a portfolio.', 'red');
+    this.add("Try 'about' or 'projects' for actual content.", 'dim');
+    this.add('');
+  },
+
+  cmdCoffee() {
+    this.add('');
+    this.add('  ( (', 'yel');
+    this.add('   ) )', 'yel');
+    this.add('  .______.', 'yel');
+    this.add('  |      |]', 'yel');
+    this.add('  \\      /', 'yel');
+    this.add("   `----'", 'yel');
+    this.add('');
+    this.add('  Not much of a barista.', 'dim');
+    this.add('');
+  },
+
+  async cmdExit() {
+    this.rmInput();
+    this.add('logout');
+    this.add('[Process completed]', 'dim');
+    await sleep(1200);
+    term.innerHTML = '';
+    const now = new Date();
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ds = `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    this.add(`Last login: ${ds} on ttys000`, 'dim');
+    this.mkInput();
+    this.busy = false;
+    hinp.focus();
+  },
+};
+
+// ============================================================
+//  START
+// ============================================================
+bootSequence();
+</script>
 </body>
 </html>
