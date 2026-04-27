@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeremy — Terminal</title>
+    <style>
+        /* DESKTOP BACKGROUND */
+        body {
+            background-color: #2e2e2e;
+            background-image: linear-gradient(45deg, #2e2e2e 25%, #333 25%, #333 50%, #2e2e2e 50%, #2e2e2e 75%, #333 75%, #333 100%);
+            background-size: 20px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* MAC WINDOW CONTAINER */
+        .mac-window {
+            width: 800px;
+            height: 90vh;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* TITLE BAR */
+        .title-bar {
+            background-color: #333333;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #000;
+            flex-shrink: 0;
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            margin-right: 20px;
+        }
+
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .close { background-color: #ff5f56; }
+        .minimize { background-color: #ffbd2e; }
+        .maximize { background-color: #27c93f; }
+
+        .window-title {
+            flex-grow: 1;
+            text-align: center;
+            color: #999;
+            font-family: -apple-system, sans-serif;
+            font-size: 13px;
+            margin-right: 52px;
+            font-weight: 500;
+        }
+
+        /* TERMINAL BODY */
+        .terminal-body {
+            flex-grow: 1;
+            padding: 10px 20px 20px 20px;
+            overflow-y: auto;
+            color: #bbbbbb;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-body::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        /* HEADING STYLES */
+        
+        /* 1. The First Heading (Title) - Keep simple */
+        h1.title {
+            color: #ffffff;
+            font-size: 14px;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        /* 2. All other Headings (Prompt Style) */
+        h1:not(.title) {
+            margin-top: 20px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: normal;
+        }
+
+        /* The Prompt Prefix Logic */
+        h1:not(.title)::before {
+            content: "jeremyh@MacBook-Pro : ~ $ ";
+            color: #36d7b7; /* Cyan color for the prompt */
+        }
+
+        /* OTHER TEXT STYLES */
+        h2 {
+            color: #ffffff;
+            font-size: 13px;
+            margin-top: 10px;
+            margin-bottom: 3px;
+            font-weight: normal;
+        }
+
+        p {
+            margin: 0 0 5px 0;
+            color: #e0e0e0;
+        }
+
+        ul, ol {
+            margin: 0 0 15px 20px;
+            padding: 0;
+            color: #e0e0e0;
+        }
+        li {
+            margin-bottom: 2px;
+        }
+
+        a {
+            color: #36d7b7;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            border: 0;
+            border-bottom: 1px dashed #555;
+            margin: 15px 0;
+        }
+
+        /* FOOTER PROMPT */
+        .prompt-area {
+            margin-top: 10px;
+            display: flex;
+            color: #fff;
+        }
+        .prompt-user { color: #36d7b7; font-weight: bold; }
+        .prompt-at { color: #888; }
+        .prompt-host { color: #36d7b7; font-weight: bold; }
+        .prompt-dir { color: #ffbd2e; font-weight: bold; }
+
+        /* BLINKING CURSOR */
+        .cursor-block {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: #bbbbbb;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mac-window">
+        <!-- TITLE BAR -->
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <div class="traffic-light close"></div>
+                <div class="traffic-light minimize"></div>
+                <div class="traffic-light maximize"></div>
+            </div>
+            <div class="window-title">jeremyh — 80x24</div>
+        </div>
+
+        <!-- TERMINAL CONTENT -->
+        <div class="terminal-body">
+            
+            <p>Last login: <span id="currentTime"></span> on ttys000</p>
+            <br>
+
+            <!-- ONLY HEADING WITHOUT PROMPT PREFIX -->
+            <h1 class="title">Hello, welcome to my personal website.</h1>
+
+            <!-- AUTOMATIC PROMPT PREFIX ADDED BY CSS -->
+            <h1>Questions</h1>
+            <h2>Who made this?</h2>
+            <p>It was made by me, a 13 year old, Jeremy.</p>
+            
+            <h2>Why did you make this?</h2>
+            <p>I was bored.</p>
+            
+            <h2>How can i contact you?</h2>
+            <p>By emailing: jeremyh@jeremyh.me</p>
+            
+            <h2>Why does this website look so bad?</h2>
+            <p>I coded it my self in 2 minutes.</p>
+
+            <hr>
+
+            <h1>Current Status</h1>
+            <p>Sleeping</p>
+
+            <h1>Location</h1>
+            <p>Miami, Florida, United States of America, Earth, Solar System.......</p>
+
+            <h1>Interests</h1>
+            <p>I am not telling you.</p>
+
+            <hr>
+
+            <h1>Dreams</h1>
+            <ul>
+                <li>
+                    Get into good college, MIT, Harvard, Stanford, Rice, Columbia, Princeton, Dartmouth, Brown, etc................
+                </li>
+                <li>Qualify and do good on AIME.</li>
+                <li>Sleep well.</li>
+            </ul>
+            <ul></ul>
+
+            <h1>Favorite things</h1>
+            <ol>
+                <li>Anthropic Claude</li>
+                <li>Violin</li>
+                <li>My bed.</li>
+                <li>My friend, Caden D.</li>
+            </ol>
+
+            <hr>
+
+            <h1>Extra stuff</h1>
+            <ul>
+                <li><a href="https://artofproblemsolving.com" target="_blank">AoPS</a></li>
+                <li><a href="https://www.theholyrosary.org" target="_blank">?</a></li>
+            </ul>
+
+            <h1>Friend tier list</h1>
+            <ol>
+                <li>Caden D.</li>
+                <li>Leonardo H.</li>
+                <li>Claude</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>Redacted</li>
+                <li>John Anthony</li>
+            </ol>
+
+            <p style="color: #999;">You might be asking why John Anthony is so low down the list...John Anthony if you are reading this, you have not spoken to me in 231346234623462 years.</p>
+            <br>
+            <p style="color: #999;">I am so lonely...Please email me. :-[</p>
+
+            <br>
+            <!-- ACTIVE PROMPT AT BOTTOM -->
+            <div class="prompt-area">
+                <span class="prompt-user">jeremyh@MacBook-Pro</span>
+                <span class="prompt-at">:</span>
+                <span class="prompt-dir">~</span>
+                <span class="prompt-at">$</span>
+                <span class="cursor-block"></span>
+            </div>
+            <small>Copyright Jeremy H. 2026</small>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FOR TIME -->
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const timeString = now.toLocaleTimeString('en-US', options); 
+            document.getElementById('currentTime').innerText = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+
+</body>
+</html>
