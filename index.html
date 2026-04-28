@@ -2,674 +2,787 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terminal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;background:#000}
-body{
-  font-family:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;
-  color:#e5e5e5;font-size:13px;line-height:1.55;
-}
-#term{
-  height:100%;padding:12px 14px;overflow-y:auto;
-  white-space:pre-wrap;word-break:break-all;
-  scrollbar-width:thin;scrollbar-color:#333 transparent;
-}
-#term::-webkit-scrollbar{width:6px}
-#term::-webkit-scrollbar-track{background:transparent}
-#term::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
-.irow{line-height:1.55}
-.cur{display:inline;animation:blink 1s step-end infinite}
-@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
-.dim{opacity:.45}
-.bld{color:#5af78e}
-.blu{color:#57c7ff}
-.yel{color:#f3f99d}
-.red{color:#ff3333}
-.cyn{color:#9aedfe}
-.mgn{color:#d6acff}
-.org{color:#ff6ac1}
-.okg{color:#5af78e}
-.b{font-weight:700}
-#hinp{position:fixed;left:-9999px;opacity:0;font-family:inherit;font-size:13px}
-.hbtn{
-  position:fixed;bottom:16px;right:16px;width:28px;height:28px;border-radius:50%;
-  border:1px solid #3a3a3a;background:rgba(8,8,8,.88);color:#555;
-  font-size:13px;font-family:inherit;cursor:pointer;z-index:20;
-  display:none;align-items:center;justify-content:center;
-  transition:border-color .2s,color .2s;line-height:1;padding:0;
-}
-.hbtn:hover{border-color:#777;color:#bbb}
-.hbtn.on{border-color:#57c7ff;color:#57c7ff}
-.guide{
-  position:fixed;bottom:52px;right:16px;width:310px;max-height:72vh;
-  background:#0a0a0a;border:1px solid #252525;border-radius:8px;
-  padding:14px 16px;overflow-y:auto;z-index:15;
-  font-size:11.5px;line-height:1.7;
-  scrollbar-width:thin;scrollbar-color:#333 transparent;display:none;
-}
-.guide::-webkit-scrollbar{width:4px}
-.guide::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
-.gc{color:#57c7ff;font-weight:700;margin-top:10px}
-.gc:first-child{margin-top:0}
-.gcmd{color:#5af78e}
-.gd{color:#777}
-.gsep{color:#222;margin:6px 0 2px}
-.gtip{color:#555}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Pixelify Sans',monospace;font-size:14px;overflow:hidden;width:100vw;height:100vh;background:#008080;user-select:none;-webkit-user-select:none;}
+
+#bios-screen{position:fixed;inset:0;background:#000;z-index:10000;display:flex;align-items:flex-start;padding:32px 28px;transition:opacity .5s ease;}
+#bios-screen.fade-out{opacity:0;pointer-events:none;}
+#bios-screen::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px);}
+#bios-text{color:#aaa;font-size:14px;line-height:1.8;white-space:pre;}
+#bios-cursor{display:inline-block;width:8px;height:14px;background:#aaa;animation:blink .5s step-end infinite;vertical-align:middle;}
+@keyframes blink{50%{opacity:0;}}
+
+#desktop{display:none;width:100vw;height:calc(100vh - 34px);position:relative;overflow:hidden;}
+#desktop.visible{display:block;}
+
+.di{position:absolute;width:72px;display:flex;flex-direction:column;align-items:center;padding:4px;cursor:default;border:1px solid transparent;}
+.di.sel{border-color:#fff;}
+.di.sel .il{background:#000080;color:#fff;text-shadow:none;}
+.ig{width:32px;height:32px;margin-bottom:3px;image-rendering:pixelated;flex-shrink:0;}
+.il{font-size:11px;color:#fff;text-align:center;text-shadow:1px 1px 1px rgba(0,0,0,.9);padding:1px 3px;word-wrap:break-word;max-width:72px;line-height:1.25;}
+
+.win{position:absolute;background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;display:none;flex-direction:column;min-width:220px;min-height:140px;}
+.win.open{display:flex;}
+.win.inactive .wtb{background:linear-gradient(90deg,#808080,#b0b0b0)!important;}
+.wtb{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:2px 3px;display:flex;align-items:center;height:22px;flex-shrink:0;gap:4px;}
+.wtt{flex:1;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.wc{display:flex;gap:2px;}
+.tb{width:16px;height:14px;background:#c0c0c0;border:1px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Pixelify Sans',monospace;cursor:default;padding:0;line-height:1;color:#000;}
+.tb:active{border-color:#000 #fff #fff #000;box-shadow:inset -1px -1px 0 #dfdfdf,inset 1px 1px 0 #808080;}
+
+.wmb{display:flex;padding:1px 0;flex-shrink:0;border-bottom:1px solid #808080;background:#c0c0c0;}
+.mi{padding:2px 8px;font-size:12px;cursor:default;}
+.mi:hover{background:#000080;color:#fff;}
+.wco{flex:1;overflow:auto;margin:2px;}
+.wsb{border-top:1px solid #808080;padding:2px 4px;font-size:11px;flex-shrink:0;background:#c0c0c0;}
+.sbs{border:1px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;padding:1px 6px;display:inline-block;}
+.rh{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#808080 50%,#808080 55%,transparent 55%),linear-gradient(135deg,transparent 65%,#808080 65%,#808080 70%,transparent 70%),linear-gradient(135deg,transparent 80%,#808080 80%,#808080 85%,transparent 85%);}
+
+.wb{background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:inset -1px -1px 0 #808080,inset 1px 1px 0 #dfdfdf;font-family:'Pixelify Sans',monospace;font-size:12px;padding:4px 16px;cursor:default;color:#000;outline:none;}
+.wb:active{border-color:#404040 #fff #fff #404040;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #dfdfdf;padding:5px 15px 3px 17px;}
+.wb:focus{outline:1px dotted #000;outline-offset:-4px;}
+
+.nta{width:100%;height:100%;border:none;background:#fff;font-family:'Pixelify Sans',monospace;font-size:13px;resize:none;outline:none;padding:4px;color:#000;}
+
+.fb{display:flex;flex-direction:column;height:100%;}
+.ab{display:flex;align-items:center;gap:4px;padding:2px 4px;background:#c0c0c0;border-bottom:1px solid #808080;}
+.ab label{font-size:11px;flex-shrink:0;}
+.abi{flex:1;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;background:#fff;font-family:'Pixelify Sans',monospace;font-size:12px;padding:2px 4px;outline:none;}
+.fl{flex:1;background:#fff;margin:2px;padding:4px;overflow:auto;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;}
+
+.emf{display:flex;flex-direction:column;height:100%;padding:4px;gap:4px;}
+.emr{display:flex;align-items:center;gap:4px;}
+.emr label{font-size:12px;width:54px;flex-shrink:0;text-align:right;}
+.emi{flex:1;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;background:#fff;font-family:'Pixelify Sans',monospace;font-size:12px;padding:2px 4px;outline:none;}
+.emb{flex:1;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;background:#fff;font-family:'Pixelify Sans',monospace;font-size:12px;padding:4px;outline:none;resize:none;}
+.ema{display:flex;gap:6px;padding-top:4px;}
+
+.sp{padding:14px;display:flex;flex-direction:column;gap:14px;}
+.sr{display:flex;align-items:center;gap:8px;}
+.slbl{width:110px;font-size:12px;text-align:right;flex-shrink:0;}
+.sbg{flex:1;height:18px;border:2px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;background:#fff;position:relative;overflow:hidden;}
+.sbf{height:100%;background:repeating-linear-gradient(90deg,#000080 0px,#000080 8px,#0000a0 8px,#0000a0 10px);}
+.spct{font-size:11px;width:36px;text-align:left;flex-shrink:0;}
+
+#taskbar{position:fixed;bottom:0;left:0;right:0;height:34px;background:#c0c0c0;border-top:2px solid #fff;display:none;align-items:center;padding:2px 3px;gap:2px;z-index:9000;}
+#taskbar.visible{display:flex;}
+#start-btn{height:26px;padding:0 8px;font-family:'Pixelify Sans',monospace;font-size:12px;font-weight:bold;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:inset -1px -1px 0 #808080,inset 1px 1px 0 #dfdfdf;cursor:default;display:flex;align-items:center;gap:5px;flex-shrink:0;outline:none;color:#000;}
+#start-btn:active,#start-btn.active{border-color:#404040 #fff #fff #404040;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #dfdfdf;}
+#tw{flex:1;display:flex;gap:2px;overflow:hidden;padding:0 2px;}
+.ttb{height:26px;padding:0 8px;font-family:'Pixelify Sans',monospace;font-size:11px;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:inset -1px -1px 0 #808080,inset 1px 1px 0 #dfdfdf;cursor:default;max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:flex;align-items:center;outline:none;color:#000;}
+.ttb.active{border-color:#404040 #fff #fff #404040;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #dfdfdf;background:#a8a8a8;}
+#st{border:1px solid;border-color:#808080 #fff #fff #808080;box-shadow:inset 1px 1px 0 #404040,inset -1px -1px 0 #dfdfdf;padding:2px 10px;font-size:11px;height:26px;display:flex;align-items:center;flex-shrink:0;}
+
+#smenu{position:fixed;bottom:34px;left:0;width:185px;background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;display:none;z-index:9500;flex-direction:column;}
+#smenu.visible{display:flex;}
+.smsb{position:absolute;left:2px;top:2px;bottom:2px;width:24px;background:linear-gradient(to top,#000080,#1084d0);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;}
+.smsb span{color:#c0c0c0;font-size:12px;font-weight:bold;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:2px;}
+.smi{margin-left:28px;display:flex;flex-direction:column;padding:2px 0;}
+.smii{padding:6px 14px;font-size:12px;cursor:default;display:flex;align-items:center;gap:8px;}
+.smii:hover{background:#000080;color:#fff;}
+.smd{height:1px;background:#808080;margin:2px 4px;border-bottom:1px solid #fff;}
+
+#ctx{position:fixed;background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;display:none;z-index:9999;min-width:170px;padding:2px;}
+#ctx.visible{display:block;}
+.ci{padding:4px 28px;font-size:12px;cursor:default;white-space:nowrap;}
+.ci:hover{background:#000080;color:#fff;}
+.cdv{height:1px;background:#808080;margin:2px 2px;border-bottom:1px solid #fff;}
+
+.dov{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;z-index:9800;}
+.dov.visible{display:flex;}
+.dbox{background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;min-width:300px;max-width:420px;}
+.dtb{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:2px 4px;font-size:12px;display:flex;align-items:center;}
+.dbdy{padding:20px 16px;display:flex;gap:14px;align-items:flex-start;}
+.dico{width:32px;height:32px;flex-shrink:0;}
+.dtxt{font-size:12px;line-height:1.5;}
+.dact{padding:0 16px 14px;display:flex;justify-content:center;gap:8px;}
+.djk{font-size:28px;font-weight:bold;color:#000080;text-align:center;padding:20px 40px;line-height:1.6;}
+
+#shutdown{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:10001;flex-direction:column;gap:20px;}
+#shutdown.visible{display:flex;}
+#shutdown p{color:#e8a000;font-size:18px;text-align:center;line-height:1.8;}
+#shutdown button{font-family:'Pixelify Sans',monospace;font-size:14px;padding:8px 24px;cursor:default;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;color:#000;}
+
+::-webkit-scrollbar{width:16px;height:16px;}
+::-webkit-scrollbar-track{background:#c0c0c0;border:1px solid #808080;}
+::-webkit-scrollbar-thumb{background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;}
+::-webkit-scrollbar-button{background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:inset 1px 1px 0 #dfdfdf,inset -1px -1px 0 #808080;display:block;height:16px;width:16px;}
+
 @media(max-width:640px){
-  #term{font-size:12px;padding:8px 10px}
-  .guide{width:calc(100vw - 32px);right:16px;font-size:11px}
+  .win.open{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:calc(100vh - 34px)!important;min-width:unset!important;min-height:unset!important;border:none!important;box-shadow:none!important;}
+  .rh{display:none;}
+  .di{width:62px;}.il{font-size:10px;max-width:62px;}.ig{width:28px;height:28px;}
+  #smenu{width:165px;}
+  .slbl{width:75px;font-size:11px;}
+  .dbox{max-width:90vw;min-width:unset;}
+  .emr label{width:40px;font-size:11px;}
 }
-@media(prefers-reduced-motion:reduce){.cur{animation:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
 </style>
 </head>
 <body>
 
-<div id="term"></div>
-<input type="text" id="hinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input">
+<div id="bios-screen"><pre id="bios-text"></pre><span id="bios-cursor"></span></div>
+<div id="desktop" role="main"></div>
 
-<button class="hbtn" id="hbtn" aria-label="Command guide">?</button>
+<div id="taskbar" role="navigation" aria-label="Taskbar">
+  <button id="start-btn" aria-label="Start menu">
+    <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" fill="#f00"/><rect x="9" y="1" width="6" height="6" fill="#0a0"/><rect x="1" y="9" width="6" height="6" fill="#00f"/><rect x="9" y="9" width="6" height="6" fill="#fc0"/></svg>
+    Start
+  </button>
+  <div id="tw"></div>
+  <div id="st"><span id="clock"></span></div>
+</div>
 
-<div class="guide" id="guide">
-  <div class="gc">PORTFOLIO</div>
-  <div><span class="gcmd">about</span> <span class="gd">Who I am</span></div>
-  <div><span class="gcmd">skills</span> <span class="gd">Technical skills</span></div>
-  <div><span class="gcmd">projects</span> <span class="gd">Things I've built</span></div>
-  <div><span class="gcmd">experience</span> <span class="gd">Work history</span></div>
-  <div><span class="gcmd">contact</span> <span class="gd">Get in touch</span></div>
-  <div class="gc">FILESYSTEM</div>
-  <div><span class="gcmd">ls [-a]</span> <span class="gd">List files (-a shows hidden)</span></div>
-  <div><span class="gcmd">cd &lt;dir&gt;</span> <span class="gd">Change directory</span></div>
-  <div><span class="gcmd">cat &lt;file&gt;</span> <span class="gd">Read file contents</span></div>
-  <div><span class="gcmd">pwd</span> <span class="gd">Print working directory</span></div>
-  <div class="gc">SYSTEM</div>
-  <div><span class="gcmd">neofetch</span> <span class="gd">System info + logo</span></div>
-  <div><span class="gcmd">uname [-a]</span> <span class="gd">System name</span></div>
-  <div><span class="gcmd">uptime</span> <span class="gd">Uptime info</span></div>
-  <div><span class="gcmd">date</span> <span class="gd">Current date &amp; time</span></div>
-  <div><span class="gcmd">whoami</span> <span class="gd">Current user</span></div>
-  <div class="gc">UTILITY</div>
-  <div><span class="gcmd">echo &lt;text&gt;</span> <span class="gd">Print text</span></div>
-  <div><span class="gcmd">history</span> <span class="gd">Past commands</span></div>
-  <div><span class="gcmd">clear</span> <span class="gd">Clear screen (also Ctrl+L)</span></div>
-  <div><span class="gcmd">exit</span> <span class="gd">Close terminal</span></div>
-  <div class="gc">FUN</div>
-  <div><span class="gcmd">hack</span> <span class="gd">???</span></div>
-  <div><span class="gcmd">coffee</span> <span class="gd">Brew a cup</span></div>
-  <div><span class="gcmd">sudo</span> <span class="gd">Try it</span></div>
-  <div class="gsep">───────────────────────────</div>
-  <div class="gtip">Tab to autocomplete commands &amp; paths</div>
-  <div class="gtip">Up / Down arrows to browse history</div>
-  <div class="gtip">Try: ls -a  then  cd .secrets  then  cat diary.md</div>
+<div id="smenu" role="menu">
+  <div class="smsb"><span>DesktopOS 95</span></div>
+  <div class="smi">
+    <div class="smii" data-action="about">
+      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" fill="#fff" stroke="#000" stroke-width=".8"/><line x1="4" y1="4" x2="12" y2="4" stroke="#000080" stroke-width=".6"/><line x1="4" y1="6" x2="12" y2="6" stroke="#000080" stroke-width=".6"/><line x1="4" y1="8" x2="12" y2="8" stroke="#000080" stroke-width=".6"/><line x1="4" y1="10" x2="10" y2="10" stroke="#000080" stroke-width=".6"/></svg>
+      About Me
+    </div>
+    <div class="smii" data-action="projects">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3l6-2v14l-6-2z" fill="#ffcc00" stroke="#000" stroke-width=".7"/><rect x="8" y="1" width="6" height="14" fill="#ffcc00" stroke="#000" stroke-width=".7"/></svg>
+      Projects
+    </div>
+    <div class="smii" data-action="contact">
+      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000" stroke-width=".8"/><polyline points="1,3 8,9 15,3" fill="none" stroke="#000" stroke-width=".8"/></svg>
+      Contact
+    </div>
+    <div class="smii" data-action="skills">
+      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" fill="#c0c0c0" stroke="#000" stroke-width=".8"/><rect x="3" y="5" width="10" height="2" fill="#000080"/></svg>
+      System Info
+    </div>
+    <div class="smd"></div>
+    <div class="smii" data-action="secret">
+      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" fill="#c0c0c0" stroke="#000" stroke-width=".8"/><path d="M4 3V2a4 4 0 0 1 8 0v1" fill="none" stroke="#000" stroke-width="1"/><circle cx="8" cy="9" r="2" fill="#000"/></svg>
+      DO_NOT_OPEN
+    </div>
+    <div class="smd"></div>
+    <div class="smii" data-action="shutdown">
+      <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="9" r="6" fill="none" stroke="#000" stroke-width="1.2"/><line x1="8" y1="2" x2="8" y2="9" stroke="#000" stroke-width="1.5"/><path d="M5 5l3 4" stroke="#000" stroke-width="1.2" fill="none"/></svg>
+      Shut Down...
+    </div>
+  </div>
+</div>
+
+<div id="ctx" role="menu">
+  <div class="ci" data-action="about">Open About Me</div>
+  <div class="ci" data-action="projects">Open Projects</div>
+  <div class="ci" data-action="contact">Send Email</div>
+  <div class="ci" data-action="skills">System Info</div>
+  <div class="cdv"></div>
+  <div class="ci" data-action="arrange">Arrange Icons</div>
+  <div class="cdv"></div>
+  <div class="ci" data-action="refresh">Refresh</div>
+  <div class="ci" data-action="properties">Properties</div>
+</div>
+
+<div class="dov" id="recycle-dlg">
+  <div class="dbox">
+    <div class="dtb"><span>Recycle Bin</span></div>
+    <div class="dbdy">
+      <svg class="dico" viewBox="0 0 32 32"><rect x="4" y="8" width="24" height="20" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/><rect x="8" y="4" width="16" height="4" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/><line x1="12" y1="12" x2="12" y2="24" stroke="#000080" stroke-width="1.5"/><line x1="16" y1="12" x2="16" y2="24" stroke="#000080" stroke-width="1.5"/><line x1="20" y1="12" x2="20" y2="24" stroke="#000080" stroke-width="1.5"/></svg>
+      <div class="dtxt">The Recycle Bin is empty.<br><br>Nothing to see here. Move along.</div>
+    </div>
+    <div class="dact"><button class="wb" id="recycle-ok">OK</button></div>
+  </div>
+</div>
+
+<div class="dov" id="destruct-dlg">
+  <div class="dbox">
+    <div class="dtb"><span>System Alert</span></div>
+    <div class="dbdy">
+      <svg class="dico" viewBox="0 0 32 32"><polygon points="16,2 30,28 2,28" fill="#ffff00" stroke="#000" stroke-width="1.5"/><text x="16" y="24" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">!</text></svg>
+      <div class="dtxt" id="destruct-msg">Warning: This computer will self-destruct in 10 seconds.</div>
+    </div>
+    <div class="dact" id="destruct-acts"><button class="wb" id="destruct-cancel">Cancel</button></div>
+  </div>
+</div>
+
+<div class="dov" id="props-dlg">
+  <div class="dbox">
+    <div class="dtb"><span>Display Properties</span></div>
+    <div class="dbdy" style="flex-direction:column;gap:10px;">
+      <div class="dtxt">Background: Teal (#008080)<br>Resolution: 640 x 480<br>Colors: 256 Colors<br>Wallpaper: (None)</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;">Preview:</span>
+        <div style="width:60px;height:40px;background:#008080;border:2px solid;border-color:#808080 #fff #fff #808080;"></div>
+      </div>
+    </div>
+    <div class="dact"><button class="wb" id="props-ok">OK</button><button class="wb" id="props-cancel">Cancel</button></div>
+  </div>
+</div>
+
+<div class="dov" id="msg-dlg">
+  <div class="dbox">
+    <div class="dtb"><span>Information</span></div>
+    <div class="dbdy">
+      <svg class="dico" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#000080" stroke-width="2"/><text x="16" y="23" text-anchor="middle" font-size="22" font-weight="bold" fill="#000080">i</text></svg>
+      <div class="dtxt" id="msg-text"></div>
+    </div>
+    <div class="dact"><button class="wb" id="msg-ok">OK</button></div>
+  </div>
+</div>
+
+<div id="shutdown">
+  <p>It's now safe to turn off<br>your computer.</p>
+  <button id="restart-btn">Restart</button>
 </div>
 
 <script>
-// ============================================================
-//  PERSONAL CONFIG — EDIT THIS
-// ============================================================
-const C = {
-  name: 'Jeremy H.',
-  username: 'user',
-  hostname: 'MacBook-Air',
-  location: 'Miami, Florida, United States of America, Earth, Solar System',
-  email: 'jeremy.rounding538@slmails.com BTW: this is a email address that redirects mail to my real email. I do not trust you enough.',
-  github: 'https://github.com/jhxaybzc',
-  linkedin: 'dont have one',
-  twitter: 'what is twitter',
-  website: 'this website',
-  bio: 'I build things for the web. I care about craft and making things that feel alive. Currently doing [your current thing]. Always learning, always shipping.',
-  skills: [
-    { cat: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'Rust', 'Go'] },
-    { cat: 'Frontend', items: ['React', 'Vue', 'Next.js', 'Three.js', 'Tailwind'] },
-    { cat: 'Backend', items: ['Node.js', 'PostgreSQL', 'Redis', 'Docker', 'AWS'] },
-    { cat: 'Creative', items: ['Figma', 'Blender', 'After Effects', 'TouchDesigner'] },
-  ],
-  experience: [
-    { role: 'Senior Developer', co: 'Company Name', period: '2022 — Present',
-      desc: 'Leading frontend architecture. Shipped [achievement]. Reduced load times by [X]%.' },
-    { role: 'Developer', co: 'Previous Company', period: '2020 — 2022',
-      desc: 'Built [thing] used by [number] people. Led migration from [old] to [new].' },
-    { role: 'Junior Developer', co: 'First Company', period: '2018 — 2020',
-      desc: 'Started here. Built internal tools and customer-facing features.' },
-  ],
-  projects: [
-    { name: 'Project One', desc: 'A thing I built that does something cool.', tech: ['React', 'Node.js', 'PostgreSQL'], link: '#' },
-    { name: 'Project Two', desc: 'An experiment in creative coding.', tech: ['Three.js', 'GLSL', 'WebGL'], link: '#' },
-    { name: 'Project Three', desc: 'Open source tool that solves a real problem.', tech: ['Rust', 'WASM', 'TypeScript'], link: '#' },
-    { name: 'Project Four', desc: 'A side project that got way out of hand.', tech: ['Python', 'FastAPI', 'Redis'], link: '#' },
-  ],
-  diary: 'Day 1: Finally got the terminal portfolio working.\n       Only took me 47 attempts.\n\nDay 2: Someone found the hidden directory.\n       If you\'re reading this, congratulations.\n       You\'re exactly the kind of curious person\n       I\'d want to work with.\n\nDay 3: *redacted*',
-};
+(function() {
+  var zTop = 100;
+  var wins = {};
+  var activeWinId = null;
+  var destructInterval = null;
 
-// ============================================================
-//  UTILITIES
-// ============================================================
-const $ = s => document.querySelector(s);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const pad = (s, n, c = ' ') => { while (s.length < n) s += c; return s; };
-const startTime = Date.now();
-function uptime() {
-  const s = Math.floor((Date.now() - startTime) / 1000);
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-  return h > 0 ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` : `${m}:${String(sec).padStart(2,'0')}`;
-}
+  /* ===== ICON SVGs ===== */
+  var ICONS = {
+    notepad: '<svg class="ig" viewBox="0 0 32 32"><rect x="4" y="1" width="20" height="30" fill="#fff" stroke="#000" stroke-width="1.2"/><rect x="6" y="1" width="16" height="4" fill="#000080"/><line x1="7" y1="8" x2="21" y2="8" stroke="#808080" stroke-width=".8"/><line x1="7" y1="11" x2="21" y2="11" stroke="#808080" stroke-width=".8"/><line x1="7" y1="14" x2="18" y2="14" stroke="#808080" stroke-width=".8"/><line x1="7" y1="17" x2="21" y2="17" stroke="#808080" stroke-width=".8"/><line x1="7" y1="20" x2="15" y2="20" stroke="#808080" stroke-width=".8"/><rect x="24" y="8" width="5" height="22" fill="#c0c0c0" stroke="#000" stroke-width="1"/></svg>',
+    folder: '<svg class="ig" viewBox="0 0 32 32"><path d="M2 8v20h28V8H14l-3-4H2z" fill="#ffcc00" stroke="#000" stroke-width="1.2"/><rect x="2" y="10" width="28" height="18" fill="#ffe066"/></svg>',
+    mail: '<svg class="ig" viewBox="0 0 32 32"><rect x="2" y="6" width="28" height="20" fill="#fff" stroke="#000" stroke-width="1.2"/><polyline points="2,6 16,17 30,6" fill="none" stroke="#000" stroke-width="1.2"/><line x1="2" y1="26" x2="11" y2="17" stroke="#000" stroke-width=".8"/><line x1="30" y1="26" x2="21" y2="17" stroke="#000" stroke-width=".8"/></svg>',
+    panel: '<svg class="ig" viewBox="0 0 32 32"><rect x="2" y="2" width="28" height="28" fill="#c0c0c0" stroke="#000" stroke-width="1.2"/><rect x="5" y="5" width="22" height="22" fill="#fff" stroke="#808080" stroke-width=".8"/><rect x="7" y="10" width="18" height="3" fill="#000080"/><rect x="7" y="16" width="14" height="3" fill="#000080"/><rect x="7" y="22" width="10" height="3" fill="#000080"/></svg>',
+    secret: '<svg class="ig" viewBox="0 0 32 32"><rect x="4" y="12" width="24" height="18" fill="#c0c0c0" stroke="#000" stroke-width="1.2"/><path d="M8 12V8a8 8 0 0 1 16 0v4" fill="none" stroke="#000" stroke-width="1.5"/><circle cx="16" cy="22" r="4" fill="#808080" stroke="#000" stroke-width="1"/><line x1="16" y1="25" x2="16" y2="28" stroke="#000" stroke-width="2"/></svg>',
+    recycle: '<svg class="ig" viewBox="0 0 32 32"><rect x="6" y="10" width="20" height="18" fill="#c0c0c0" stroke="#000" stroke-width="1.2"/><rect x="9" y="6" width="14" height="4" fill="#c0c0c0" stroke="#000" stroke-width="1.2"/><line x1="10" y1="14" x2="10" y2="25" stroke="#808080" stroke-width="1.5"/><line x1="16" y1="14" x2="16" y2="25" stroke="#808080" stroke-width="1.5"/><line x1="22" y1="14" x2="22" y2="25" stroke="#808080" stroke-width="1.5"/></svg>'
+  };
 
-// ============================================================
-//  HELP BUTTON
-// ============================================================
-const hbtn = $('#hbtn');
-const guide = $('#guide');
-let guideOpen = false;
+  /* ===== BIOS ===== */
+  var biosLines = [
+    'DesktopOS BIOS v2.41 (C) 1994 DesktopOS Inc.',
+    'Copyright (C) 1994,95 DesktopOS Incorporated',
+    '',
+    'Processor: 486DX2-66MHz',
+    'Memory Test:  16384K OK',
+    '',
+    'Detecting IDE drives...',
+    '  Primary Master : ST-3120A  (120MB)',
+    '  Primary Slave  : None',
+    '  Secondary Master: CD-ROM 2x',
+    '  Secondary Slave : None',
+    '',
+    'Initializing... OK',
+    '',
+    'Starting DesktopOS 95...'
+  ];
 
-hbtn.addEventListener('click', e => {
-  e.stopPropagation();
-  guideOpen = !guideOpen;
-  guide.style.display = guideOpen ? 'block' : 'none';
-  hbtn.classList.toggle('on', guideOpen);
-});
-
-document.addEventListener('click', e => {
-  if (guideOpen && !guide.contains(e.target)) {
-    guideOpen = false;
-    guide.style.display = 'none';
-    hbtn.classList.remove('on');
-  }
-});
-
-// ============================================================
-//  BOOT SEQUENCE
-// ============================================================
-const kernelLines = [
-  '[    0.000000] Linux version 6.5.0-44-generic (buildd@lcy02-amd64-045) (x86_64-linux-gnu-gcc-12 12.3.0) #44~22.04.1-Ubuntu SMP',
-  '[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-6.5.0-44-generic root=/dev/mapper/vgubuntu-root ro quiet splash',
-  '[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable',
-  '[    0.008023] ACPI: RSDP 0x00000000000F5A00 000024 (v02)',
-  '[    0.008045] ACPI: XSDT 0x00000000BF7E1A98 00003C (v01)',
-  '[    0.032187] Initializing cgroup subsys cpuset',
-  '[    0.032189] Initializing cgroup subsys cpu',
-  '[    0.056023] CPU: AMD Ryzen 7 7800X3D 8-Core Processor',
-  '[    0.056234] x86/fpu: x87 FPU on chip',
-  '[    0.120043] PCI: Using configuration type 1',
-  '[    0.180324] clocksource: tsc: mask: 0xffffffffffffffff',
-  '[    0.240001] Calibrating delay loop (skipped).. 7200.00 BogoMIPS',
-  '[    0.360012] Memory: 16384000K/16777216K available',
-  '[    0.480023] NET: Registered PF_NETLINK/PF_ROUTE protocol',
-  '[    0.540032] pci 0000:01:00.0: [10DE:2620] NVIDIA Corporation',
-  '[    0.600012] usb 1-1: new high-speed USB device using xhci_hcd',
-  '[    0.720034] EXT4-fs (dm-0): mounted filesystem with ordered data mode',
-];
-
-const systemdLines = [
-  'Started Journal Service',
-  'Started D-Bus System Message Bus',
-  'Starting Network Manager',
-  'Started Network Manager',
-  'Reached target Network',
-  'Starting OpenSSH Daemon',
-  'Started OpenSSH Daemon',
-  'Reached target Multi-User System',
-  'Started Getty on tty1',
-];
-
-async function bootSequence() {
-  const term = $('#term');
-
-  // Kernel lines — fast
-  for (const line of kernelLines) {
-    const d = document.createElement('div');
-    d.className = 'dim';
-    d.textContent = line;
-    term.appendChild(d);
-    term.scrollTop = term.scrollHeight;
-    await sleep(28 + Math.random() * 22);
-  }
-
-  // Systemd lines — slightly slower, with green [  OK  ]
-  for (const line of systemdLines) {
-    const d = document.createElement('div');
-    d.innerHTML = '<span class="okg">[  OK  ]</span> ' + line;
-    term.appendChild(d);
-    term.scrollTop = term.scrollHeight;
-    await sleep(45 + Math.random() * 30);
-  }
-
-  // Blank line
-  const blank = document.createElement('div');
-  blank.textContent = '';
-  term.appendChild(blank);
-  await sleep(350);
-
-  // "Last login" line
-  const now = new Date();
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const dateStr = `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-  const login = document.createElement('div');
-  login.className = 'dim';
-  login.textContent = `Last login: ${dateStr} on ttys000`;
-  term.appendChild(login);
-
-  await sleep(200);
-
-  // Show help button
-  hbtn.style.display = 'flex';
-
-  // Start terminal
-  t.init();
-}
-
-// ============================================================
-//  TERMINAL
-// ============================================================
-const hinp = $('#hinp');
-const term = $('#term');
-
-const t = {
-  hist: [], hidx: -1, input: '', busy: false, inputRow: null,
-  dir: '/Users/' + C.username,
-
-  fs: {
-    ['/Users/' + C.username]: { type: 'dir', children: ['Desktop', 'Documents', 'Downloads', 'about.md', 'skills.md', 'contact.md', 'experience.md', 'projects', '.secrets'] },
-    ['/Users/' + C.username + '/projects']: { type: 'dir', children: C.projects.map((_, i) => `project${i+1}.md`) },
-    ['/Users/' + C.username + '/Desktop']: { type: 'dir', children: [] },
-    ['/Users/' + C.username + '/Documents']: { type: 'dir', children: ['resume.pdf', 'notes.txt'] },
-    ['/Users/' + C.username + '/Downloads']: { type: 'dir', children: [] },
-    ['/Users/' + C.username + '/.secrets']: { type: 'dir', children: ['diary.md'] },
-  },
-
-  resolve(base, target) {
-    if (!target) return base;
-    if (target === '~') return '/Users/' + C.username;
-    if (target.startsWith('~/')) target = '/Users/' + C.username + '/' + target.slice(2);
-    if (!target.startsWith('/')) target = (base === '/' ? '' : base) + '/' + target;
-    const parts = target.split('/').filter(Boolean), out = [];
-    for (const p of parts) { if (p === '..') out.pop(); else if (p !== '.') out.push(p); }
-    return '/' + out.join('/') || '/';
-  },
-
-  contents(path) { const d = this.fs[path]; return d && d.type === 'dir' ? d.children : null; },
-
-  prompt() {
-    let p = this.dir;
-    if (p.startsWith('/Users/' + C.username)) p = '~' + p.slice(('/Users/' + C.username).length);
-    if (!p) p = '~';
-    return `${C.username}@${C.hostname} ${p} % `;
-  },
-
-  add(text, cls = '', html = false) {
-    const d = document.createElement('div');
-    d.className = cls;
-    if (html) d.innerHTML = text; else d.textContent = text;
-    term.appendChild(d);
-    term.scrollTop = term.scrollHeight;
-    return d;
-  },
-
-  mkInput() {
-    if (this.inputRow) this.inputRow.remove();
-    const row = document.createElement('div');
-    row.className = 'irow';
-    row.innerHTML = `<span>${this.prompt()}</span><span class="il"></span><span class="cur">█</span>`;
-    term.appendChild(row);
-    this.inputRow = row;
-    term.scrollTop = term.scrollHeight;
-  },
-
-  rmInput() { if (this.inputRow) { this.inputRow.remove(); this.inputRow = null; } },
-
-  showInput() {
-    if (!this.inputRow) return;
-    this.inputRow.querySelector('.il').textContent = this.input;
-    term.scrollTop = term.scrollHeight;
-  },
-
-  init() {
-    this.mkInput();
-
-    document.addEventListener('click', () => {
-      if (!t.busy) hinp.focus();
-    });
-
-    hinp.addEventListener('input', () => { t.input = hinp.value; t.showInput(); });
-    hinp.addEventListener('keydown', e => this.onKey(e));
-    hinp.focus();
-  },
-
-  onKey(e) {
-    if (this.busy) return;
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const cmd = this.input.trim();
-      this.rmInput();
-      if (cmd) {
-        this.add(this.prompt() + cmd);
-        this.hist.push(cmd); this.hidx = -1;
-        this.run(cmd);
-      } else { this.mkInput(); }
-      this.input = ''; hinp.value = '';
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (this.hist.length && this.hidx < this.hist.length - 1) {
-        this.hidx++;
-        this.input = this.hist[this.hist.length - 1 - this.hidx];
-        hinp.value = this.input; this.showInput();
-      }
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (this.hidx > 0) { this.hidx--; this.input = this.hist[this.hist.length - 1 - this.hidx]; }
-      else { this.hidx = -1; this.input = ''; }
-      hinp.value = this.input; this.showInput();
-    } else if (e.key === 'Tab') {
-      e.preventDefault(); this.tab();
-    } else if (e.key === 'l' && e.ctrlKey) {
-      e.preventDefault(); this.rmInput(); term.innerHTML = ''; this.mkInput();
-      this.input = ''; hinp.value = '';
+  function typeBios(lines, idx, charIdx, el) {
+    if (idx >= lines.length) {
+      setTimeout(function() {
+        var bs = document.getElementById('bios-screen');
+        bs.classList.add('fade-out');
+        setTimeout(function() {
+          bs.style.display = 'none';
+          document.getElementById('desktop').classList.add('visible');
+          document.getElementById('taskbar').classList.add('visible');
+          startClock();
+          setTimeout(triggerDestruct, 30000);
+        }, 500);
+      }, 600);
+      return;
     }
-  },
-
-  tab() {
-    const parts = this.input.split(' ');
-    if (parts.length <= 1) {
-      const partial = parts[0] || '';
-      const cmds = ['help','clear','about','skills','projects','contact','experience','whoami','pwd','ls','cd','cat','neofetch','date','echo','history','uname','uptime','sudo','hack','coffee','exit'];
-      const m = cmds.filter(c => c.startsWith(partial));
-      if (m.length === 1) { this.input = m[0] + ' '; hinp.value = this.input; this.showInput(); }
-      else if (m.length > 1) this.add(m.join('  '), 'dim');
+    var line = lines[idx];
+    if (charIdx <= line.length) {
+      el.textContent = lines.slice(0, idx).join('\n') + (idx > 0 ? '\n' : '') + line.substring(0, charIdx);
+      var delay = (charIdx === 0 && line === '') ? 100 : 12 + Math.random() * 18;
+      setTimeout(function() { typeBios(lines, idx, charIdx + 1, el); }, delay);
     } else {
-      const partial = parts[parts.length - 1];
-      const entries = this.contents(this.dir) || [];
-      const m = entries.filter(e => e.startsWith(partial));
-      if (m.length === 1) {
-        parts[parts.length - 1] = m[0];
-        const node = this.fs[this.resolve(this.dir, m[0])];
-        if (node && node.type === 'dir') parts[parts.length - 1] += '/';
-        this.input = parts.join(' ') + ' '; hinp.value = this.input; this.showInput();
-      } else if (m.length > 1) this.add(m.join('  '), 'dim');
+      setTimeout(function() { typeBios(lines, idx + 1, 0, el); }, line === '' ? 200 : 80);
     }
-  },
+  }
 
-  async run(raw) {
-    const parts = raw.split(/\s+/);
-    const cmd = parts[0].toLowerCase();
-    const args = parts.slice(1);
-    this.busy = true;
-
-    switch (cmd) {
-      case 'help': this.cmdHelp(); break;
-      case 'clear': term.innerHTML = ''; break;
-      case 'about': this.cmdAbout(); break;
-      case 'skills': this.cmdSkills(); break;
-      case 'projects': this.cmdProjects(); break;
-      case 'contact': this.cmdContact(); break;
-      case 'experience': this.cmdExperience(); break;
-      case 'whoami': this.add(C.username); break;
-      case 'pwd': this.add(this.dir); break;
-      case 'ls': this.cmdLs(args); break;
-      case 'cd': this.cmdCd(args); break;
-      case 'cat': this.cmdCat(args); break;
-      case 'neofetch': this.cmdNeofetch(); break;
-      case 'date': this.add(new Date().toString()); break;
-      case 'echo': this.add(args.join(' ')); break;
-      case 'history': this.hist.forEach((h, i) => this.add(`  ${pad(String(i+1), 5)}${h}`, 'dim')); break;
-      case 'uname': this.add(args.includes('-a') ? 'Darwin PortalOS 23.4.0 Darwin Kernel Version 23.4.0 x86_64' : 'Darwin'); break;
-      case 'uptime': this.add(` ${new Date().toLocaleTimeString()}  up ${uptime()}, 1 user, load averages: 1.23 1.45 1.67`); break;
-      case 'sudo': await this.cmdSudo(); break;
-      case 'hack': await this.cmdHack(); break;
-      case 'coffee': this.cmdCoffee(); break;
-      case 'exit': await this.cmdExit(); return;
-      default: this.add(`zsh: command not found: ${cmd}`, 'red');
+  /* ===== CLOCK ===== */
+  function startClock() {
+    function tick() {
+      var d = new Date();
+      var h = d.getHours(), m = d.getMinutes();
+      var ap = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      document.getElementById('clock').textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
     }
-    this.busy = false;
-    if (cmd !== 'clear' && cmd !== 'exit') this.mkInput();
-  },
+    tick();
+    setInterval(tick, 10000);
+  }
 
-  // ---- COMMANDS ----
+  /* ===== DIALOG HELPERS ===== */
+  function showDialog(id) { document.getElementById(id).classList.add('visible'); }
+  function closeDialog(id) { document.getElementById(id).classList.remove('visible'); }
+  function showMessage(text) {
+    document.getElementById('msg-text').textContent = text;
+    showDialog('msg-dlg');
+  }
 
-  cmdHelp() {
-    const cmds = [
-      ['about',       'Who I am'],
-      ['skills',      'Technical skills'],
-      ['projects',    'Things I\'ve built'],
-      ['contact',     'Get in touch'],
-      ['experience',  'Work history'],
-      ['neofetch',    'System info'],
-      ['ls',          'List files'],
-      ['cd <dir>',    'Change directory'],
-      ['cat <file>',  'Read a file'],
-      ['pwd',         'Print working directory'],
-      ['echo <text>', 'Print text'],
-      ['history',     'Command history'],
-      ['date',        'Current date/time'],
-      ['uname [-a]',  'System name'],
-      ['uptime',      'System uptime'],
-      ['clear',       'Clear screen (also Ctrl+L)'],
-      ['hack',        '???'],
-      ['coffee',      'Brew a cup'],
-      ['sudo',        'Try it'],
-      ['exit',        'Close terminal'],
+  /* ===== BUILD DESKTOP ICONS ===== */
+  function buildDesktop() {
+    var desktop = document.getElementById('desktop');
+    var iconDefs = [
+      { id: 'about', label: 'ABOUT.TXT', icon: ICONS.notepad, x: 20, y: 20 },
+      { id: 'projects', label: 'Projects', icon: ICONS.folder, x: 20, y: 100 },
+      { id: 'contact', label: 'New Email', icon: ICONS.mail, x: 20, y: 180 },
+      { id: 'skills', label: 'System Info', icon: ICONS.panel, x: 20, y: 260 },
+      { id: 'secret', label: 'DO_NOT_OPEN', icon: ICONS.secret, x: 20, y: 340 },
+      { id: 'recycle', label: 'Recycle Bin', icon: ICONS.recycle, x: 20, y: 420 }
     ];
-    this.add('');
-    for (const [c, d] of cmds) this.add(`  ${pad(c, 16)}${d}`);
-    this.add('');
-    this.add('  Navigate the filesystem with ls, cd, cat. Tab completes.', 'dim');
-    this.add('');
-  },
 
-  cmdAbout() {
-    this.add('');
-    this.add(C.name, 'bld b');
-    this.add(C.location, 'dim');
-    this.add('');
-    this.add(C.bio);
-    this.add('');
-  },
+    iconDefs.forEach(function(ic) {
+      var div = document.createElement('div');
+      div.className = 'di';
+      div.setAttribute('data-id', ic.id);
+      div.style.left = ic.x + 'px';
+      div.style.top = ic.y + 'px';
+      div.innerHTML = ic.icon + '<span class="il">' + ic.label + '</span>';
 
-  cmdSkills() {
-    this.add('');
-    for (const s of C.skills) {
-      this.add(`  ${s.cat}`, 'yel b');
-      s.items.forEach(i => this.add(`    ${i}`, 'bld'));
-      this.add('');
+      /* Single click: select icon */
+      div.addEventListener('click', function(e) {
+        e.stopPropagation();
+        clearIconSelection();
+        div.classList.add('sel');
+      });
+
+      /* Double click: open window */
+      div.addEventListener('dblclick', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        div.classList.remove('sel');
+        handleIconOpen(ic.id);
+      });
+
+      desktop.appendChild(div);
+    });
+
+    /* Click desktop background: deselect icons, close menus */
+    desktop.addEventListener('click', function() {
+      clearIconSelection();
+      closeStartMenu();
+      closeContextMenu();
+    });
+
+    /* Right-click desktop: show context menu */
+    desktop.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY);
+    });
+  }
+
+  function clearIconSelection() {
+    document.querySelectorAll('.di').forEach(function(d) { d.classList.remove('sel'); });
+  }
+
+  /* ===== ROUTE ICON OPENS ===== */
+  function handleIconOpen(id) {
+    if (id === 'recycle') {
+      showDialog('recycle-dlg');
+    } else {
+      openWindow(id);
     }
-  },
+  }
 
-  cmdProjects() {
-    this.add('');
-    C.projects.forEach((p, i) => {
-      this.add(`  ${i+1}. ${p.name}`, 'blu b');
-      this.add(`     ${p.desc}`);
-      this.add(`     ${p.tech.join(', ')}`, 'dim');
-      if (p.link && p.link !== '#') this.add(`     ${p.link}`, 'cyn');
-      this.add('');
-    });
-    this.add('  cd projects/ and cat files for details.', 'dim');
-    this.add('');
-  },
+  /* ===== WINDOW CONTENT BUILDERS ===== */
+  function makeSkillBar(label, pct) {
+    return '<div class="sr"><span class="slbl">' + label + '</span><div class="sbg"><div class="sbf" style="width:' + pct + '%;"></div></div><span class="spct">' + pct + '%</span></div>';
+  }
 
-  cmdContact() {
-    this.add('');
-    this.add(`  Email    ${C.email}`, 'bld');
-    this.add(`  GitHub   ${C.github}`, 'blu');
-    if (C.linkedin) this.add(`  LinkedIn ${C.linkedin}`, 'blu');
-    if (C.twitter) this.add(`  Twitter  ${C.twitter}`, 'blu');
-    if (C.website) this.add(`  Web      ${C.website}`, 'blu');
-    this.add('');
-  },
-
-  cmdExperience() {
-    this.add('');
-    C.experience.forEach(e => {
-      this.add(`  ${e.role}  @  ${e.co}`, 'yel b');
-      this.add(`  ${e.period}`, 'dim');
-      this.add(`  ${e.desc}`);
-      this.add('');
-    });
-  },
-
-  cmdLs(args) {
-    const showAll = args.some(a => a === '-a' || a === '-la' || a === '-al');
-    const target = args.find(a => !a.startsWith('-'));
-    let path = this.dir;
-    if (target) path = this.resolve(this.dir, target);
-    const entries = this.contents(path);
-    if (!entries) { this.add(`ls: ${target || path}: No such file or directory`, 'red'); return; }
-    let filtered = showAll ? entries : entries.filter(e => !e.startsWith('.'));
-    if (!filtered.length) return;
-    const colored = filtered.map(e => {
-      const full = this.resolve(path, e);
-      const node = this.fs[full];
-      return node && node.type === 'dir' ? `<span class="blu">${e}</span>` : `<span>${e}</span>`;
-    });
-    this.add(colored.join('  '), '', true);
-  },
-
-  cmdCd(args) {
-    const target = args[0] || '~';
-    const path = this.resolve(this.dir, target);
-    const node = this.fs[path];
-    if (!node) { this.add(`cd: no such file or directory: ${target}`, 'red'); return; }
-    if (node.type !== 'dir') { this.add(`cd: not a directory: ${target}`, 'red'); return; }
-    this.dir = path;
-  },
-
-  cmdCat(args) {
-    if (!args[0]) { this.add('cat: missing file operand', 'red'); return; }
-    const path = this.resolve(this.dir, args[0]);
-    const node = this.fs[path];
-    if (!node) { this.add(`cat: ${args[0]}: No such file or directory`, 'red'); return; }
-    if (node.type === 'dir') { this.add(`cat: ${args[0]}: Is a directory`, 'red'); return; }
-
-    const base = path.split('/').pop();
-    let content = '';
-    if (base === 'about.md') content = `# ${C.name}\n\n${C.bio}\n\nLocation: ${C.location}`;
-    else if (base === 'skills.md') content = C.skills.map(s => `## ${s.cat}\n${s.items.map(i => '- ' + i).join('\n')}`).join('\n\n');
-    else if (base === 'contact.md') content = `Email: ${C.email}\nGitHub: ${C.github}\n${C.linkedin ? 'LinkedIn: ' + C.linkedin : ''}\n${C.twitter ? 'Twitter: ' + C.twitter : ''}`;
-    else if (base === 'experience.md') content = C.experience.map(e => `## ${e.role} @ ${e.co}\n*${e.period}*\n${e.desc}`).join('\n\n---\n\n');
-    else if (base.startsWith('project') && base.endsWith('.md')) {
-      const idx = parseInt(base.match(/\d+/)[0]) - 1;
-      const p = C.projects[idx];
-      if (p) content = `# ${p.name}\n\n${p.desc}\n\n**Tech:** ${p.tech.join(', ')}\n${p.link && p.link !== '#' ? '**Link:** ' + p.link : ''}`;
-    } else if (base === 'diary.md') content = C.diary;
-    else if (base === 'notes.txt') content = 'TODO: Update portfolio\nTODO: Add more projects\nTODO: Stop procrastinating';
-    else if (base === 'resume.pdf') { this.add(`cat: ${args[0]}: binary file (use a PDF viewer)`, 'red'); return; }
-    else content = '';
-
-    if (content) { this.add(''); content.split('\n').forEach(l => this.add(l)); this.add(''); }
-  },
-
-  cmdNeofetch() {
-    const art = [
-      '                 \'c.          ',
-      '              ,xNMM.          ',
-      '            .OMMMMo           ',
-      '            OMMM0,            ',
-      '  .;loddo:\' loolloddol;.     ',
-      'cKMMMMMMMMMMNWMMMMMMMMMM0:    ',
-      '.KMMMMMMMMMMMMMMMMMMMMMMMWd.  ',
-      'XMMMMMMMMMMMMMMMMMMMMMMMX.    ',
-      ';MMMMMMMMMMMMMMMMMMMMMMMM:     ',
-      ':MMMMMMMMMMMMMMMMMMMMMMMM:     ',
-      '.MMMMMMMMMMMMMMMMMMMMMMMMX.    ',
-      ' kMMMMMMMMMMMMMMMMMMMMMMMMWd.  ',
-      ' .XMMMMMMMMMMMMMMMMMMMMMMMMk   ',
-      '  .XMMMMMMMMMMMMMMMMMMMMK.    ',
-      '    kMMMMMMMMMMMMMMMMMMd       ',
-      '     ;KMMMMMMMWXXWMMMKo.      ',
-    ];
-    const info = [
-      `<span class="bld b">${C.username}@${C.hostname}</span>`,
-      `<span class="dim">──────────────────</span>`,
-      `<span class="bld">OS</span>          macOS 14.4 arm64`,
-      `<span class="bld">Host</span>        MacBook Air (M2)`,
-      `<span class="bld">Kernel</span>      23.4.0`,
-      `<span class="bld">Shell</span>       zsh 5.9`,
-      `<span class="bld">Terminal</span>    PortalTerm`,
-      `<span class="bld">Resolution</span>  ${innerWidth}x${innerHeight}`,
-      `<span class="bld">Uptime</span>      ${uptime()}`,
-      ``,
-      `<span style="color:#ff5f57">██</span><span style="color:#febc2e">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span><span style="color:#28c840">██</span>`,
-    ];
-    this.add('');
-    for (let i = 0; i < Math.max(art.length, info.length); i++) {
-      const a = i < art.length ? art[i] : '                           ';
-      const inf = i < info.length ? info[i] : '';
-      this.add(`${a}  ${inf}`, '', true);
+  function getWindowConfig(id) {
+    switch (id) {
+      case 'about': return {
+        title: 'ABOUT.TXT - Notepad',
+        x: 80, y: 30, w: 440, h: 320,
+        content:
+          '<div class="wmb"><span class="mi">File</span><span class="mi">Edit</span><span class="mi">Search</span><span class="mi">Help</span></div>' +
+          '<textarea class="nta" readonly>================================\n  ABOUT.TXT\n================================\n\nName: Jeremy H.\nAge: 13\nGrade: 7th\n\nI am just a little 13 year old,\n7th grade.\n\nThat\'s about it.\n\n================================\n  EOF\n================================</textarea>' +
+          '<div class="wsb"><span class="sbs">Ln 1, Col 1</span></div>'
+      };
+      case 'projects': return {
+        title: 'Projects',
+        x: 120, y: 60, w: 460, h: 340,
+        content:
+          '<div class="wmb"><span class="mi">File</span><span class="mi">Edit</span><span class="mi">View</span><span class="mi">Help</span></div>' +
+          '<div class="fb">' +
+            '<div class="ab"><label>Address:</label><input class="abi" value="C:\\Users\\Jeremy\\Desktop\\Projects" readonly></div>' +
+            '<div class="fl"><div style="padding:24px 16px;text-align:center;color:#808080;font-size:12px;line-height:1.8;">This folder is empty.<br><br>(Projects coming soon... probably)</div></div>' +
+          '</div>' +
+          '<div class="wsb"><span class="sbs">0 object(s)</span></div>'
+      };
+      case 'contact': return {
+        title: 'New Message',
+        x: 140, y: 80, w: 460, h: 380,
+        content:
+          '<div class="wmb"><span class="mi">File</span><span class="mi">Edit</span><span class="mi">View</span><span class="mi">Message</span><span class="mi">Help</span></div>' +
+          '<div class="emf">' +
+            '<div class="emr"><label>To:</label><input class="emi" value="jeremy.rounding538@slmails.com" readonly></div>' +
+            '<div class="emr"><label>From:</label><input class="emi" placeholder="(your email address)"></div>' +
+            '<div class="emr"><label>Subject:</label><input class="emi" placeholder="(enter subject)"></div>' +
+            '<textarea class="emb" placeholder="Type your message here..."></textarea>' +
+            '<div class="ema"><button class="wb" id="send-btn">Send</button><button class="wb" id="cancel-email-btn">Cancel</button></div>' +
+          '</div>' +
+          '<div class="wsb"><span class="sbs">Ready</span></div>'
+      };
+      case 'skills': return {
+        title: 'System Information',
+        x: 100, y: 50, w: 460, h: 360,
+        content:
+          '<div class="wmb"><span class="mi">File</span><span class="mi">Edit</span><span class="mi">View</span><span class="mi">Help</span></div>' +
+          '<div class="sp">' +
+            '<div style="font-size:12px;color:#000;border-bottom:1px solid #808080;padding-bottom:6px;">System Performance</div>' +
+            makeSkillBar('Math', 72) +
+            makeSkillBar('Violin', 58) +
+            makeSkillBar('Biology', 55) +
+            makeSkillBar('Chemistry', 48) +
+            makeSkillBar('Coding', 18) +
+            '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #808080;font-size:11px;color:#404040;line-height:1.6;">System: DesktopOS 95<br>Processor: 486DX2-66MHz<br>RAM: 16 MB<br>User: Jeremy H.</div>' +
+          '</div>'
+      };
+      case 'secret': return {
+        title: 'DO_NOT_OPEN',
+        x: 160, y: 70, w: 420, h: 300,
+        content:
+          '<div class="wmb"><span class="mi">File</span><span class="mi">Edit</span><span class="mi">View</span><span class="mi">Help</span></div>' +
+          '<div class="fb">' +
+            '<div class="ab"><label>Address:</label><input class="abi" value="C:\\Users\\Jeremy\\DO_NOT_OPEN" readonly></div>' +
+            '<div class="fl"><div style="padding:24px 16px;text-align:center;color:#808080;font-size:12px;line-height:1.8;">This folder is empty.<br><br>...or is it?</div></div>' +
+          '</div>' +
+          '<div class="wsb"><span class="sbs">0 object(s)</span></div>'
+      };
+      default: return null;
     }
-    this.add('');
-  },
+  }
 
-  async cmdSudo() {
-    this.add('');
-    this.add('Password:', 'yel');
-    await sleep(600);
-    this.add('Sorry, try again.', 'red');
-    this.add('sudo: 3 incorrect password attempts', 'red');
-    this.add('');
-  },
+  /* ===== WINDOW MANAGEMENT ===== */
+  function createWindow(id, title, x, y, w, h, contentHTML) {
+    var el = document.createElement('div');
+    el.className = 'win';
+    el.id = 'win-' + id;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
 
-  async cmdHack() {
-    this.rmInput();
-    const steps = ['SCANNING PORTS','BYPASSING FIREWALL','DECRYPTING','ACCESSING MAINFRAME'];
-    for (const step of steps) {
-      for (let i = 0; i <= 24; i++) {
-        const bar = '█'.repeat(i) + '░'.repeat(24 - i);
-        const pct = String(Math.round(i / 24 * 100)).padStart(3);
-        const d = document.createElement('div');
-        d.className = 'yel';
-        d.textContent = `${step}  [${bar}] ${pct}%`;
-        term.appendChild(d);
-        term.scrollTop = term.scrollHeight;
-        await sleep(12 + Math.random() * 20);
-        if (i < 24) term.removeChild(d);
+    el.innerHTML =
+      '<div class="wtb">' +
+        '<span class="wtt">' + title + '</span>' +
+        '<div class="wc">' +
+          '<button class="tb" aria-label="Minimize">_</button>' +
+          '<button class="tb" aria-label="Maximize">\u25A1</button>' +
+          '<button class="tb" aria-label="Close">x</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="wco">' + contentHTML + '</div>' +
+      '<div class="rh"></div>';
+
+    document.getElementById('desktop').appendChild(el);
+
+    wins[id] = { el: el, title: title, minimized: false, origRect: null };
+
+    /* Wire up title bar buttons */
+    var btns = el.querySelectorAll('.tb');
+    btns[0].addEventListener('click', function(e) { e.stopPropagation(); minimizeWin(id); });
+    btns[1].addEventListener('click', function(e) { e.stopPropagation(); maximizeWin(id); });
+    btns[2].addEventListener('click', function(e) { e.stopPropagation(); closeWin(id); });
+
+    /* Wire up special inner buttons after inserting into DOM */
+    if (id === 'contact') {
+      setTimeout(function() {
+        var sendBtn = document.getElementById('send-btn');
+        var cancelBtn = document.getElementById('cancel-email-btn');
+        if (sendBtn) sendBtn.addEventListener('click', function() {
+          showMessage("Your message has been sent.\n\n(Just kidding. This isn't a real email client.)");
+        });
+        if (cancelBtn) cancelBtn.addEventListener('click', function() { closeWin('contact'); });
+      }, 0);
+    }
+
+    setupDrag(el, id);
+    setupResize(el, id);
+
+    el.addEventListener('mousedown', function() { focusWin(id); });
+    el.addEventListener('touchstart', function() { focusWin(id); }, { passive: true });
+  }
+
+  function openWindow(id) {
+    /* If already open, just focus/restore it */
+    if (wins[id]) {
+      if (wins[id].minimized) {
+        wins[id].el.classList.add('open');
+        wins[id].minimized = false;
       }
-      // Replace last with OK version
-      const last = term.lastElementChild;
-      if (last) last.innerHTML = `${step}  <span class="bld">OK</span>`;
-      await sleep(80);
+      focusWin(id);
+      updateTaskbar();
+      return;
     }
-    this.add('');
-    this.add('Just kidding. This is my personal website.', 'red');
-    this.add("Try 'about' or 'projects' for actual content.", 'dim');
-    this.add('');
-  },
+    var cfg = getWindowConfig(id);
+    if (!cfg) return;
+    createWindow(id, cfg.title, cfg.x, cfg.y, cfg.w, cfg.h, cfg.content);
+    wins[id].el.classList.add('open');
+    focusWin(id);
+    updateTaskbar();
+  }
 
-  cmdCoffee() {
-    this.add('');
-    this.add('  ( (', 'yel');
-    this.add('   ) )', 'yel');
-    this.add('  .______.', 'yel');
-    this.add('  |      |]', 'yel');
-    this.add('  \\      /', 'yel');
-    this.add("   `----'", 'yel');
-    this.add('');
-    this.add('  Not much of a barista.', 'dim');
-    this.add('');
-  },
+  function closeWin(id) {
+    if (!wins[id]) return;
+    wins[id].el.remove();
+    delete wins[id];
+    if (activeWinId === id) {
+      activeWinId = null;
+      var topZ = 0, topId = null;
+      for (var k in wins) {
+        var z = parseInt(wins[k].el.style.zIndex) || 0;
+        if (z > topZ && !wins[k].minimized) { topZ = z; topId = k; }
+      }
+      if (topId) focusWin(topId); else updateWindowStates();
+    }
+    updateTaskbar();
+  }
 
-  async cmdExit() {
-    this.rmInput();
-    this.add('logout');
-    this.add('[Process completed]', 'dim');
-    await sleep(1200);
-    term.innerHTML = '';
-    const now = new Date();
-    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const ds = `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-    this.add(`Last login: ${ds} on ttys000`, 'dim');
-    this.mkInput();
-    this.busy = false;
-    hinp.focus();
-  },
-};
+  function minimizeWin(id) {
+    if (!wins[id]) return;
+    wins[id].el.classList.remove('open');
+    wins[id].minimized = true;
+    if (activeWinId === id) { activeWinId = null; updateWindowStates(); }
+    updateTaskbar();
+  }
 
-// ============================================================
-//  START
-// ============================================================
-bootSequence();
+  function maximizeWin(id) {
+    if (!wins[id]) return;
+    var el = wins[id].el;
+    if (wins[id].origRect) {
+      var r = wins[id].origRect;
+      el.style.left = r.left; el.style.top = r.top;
+      el.style.width = r.width; el.style.height = r.height;
+      wins[id].origRect = null;
+    } else {
+      wins[id].origRect = { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height };
+      var desk = document.getElementById('desktop');
+      el.style.left = '0px'; el.style.top = '0px';
+      el.style.width = desk.offsetWidth + 'px';
+      el.style.height = desk.offsetHeight + 'px';
+    }
+    focusWin(id);
+  }
+
+  function focusWin(id) {
+    if (!wins[id]) return;
+    activeWinId = id;
+    zTop++;
+    wins[id].el.style.zIndex = zTop;
+    updateWindowStates();
+    updateTaskbar();
+  }
+
+  function updateWindowStates() {
+    for (var k in wins) {
+      if (k === activeWinId) wins[k].el.classList.remove('inactive');
+      else wins[k].el.classList.add('inactive');
+    }
+  }
+
+  /* ===== TASKBAR ===== */
+  function updateTaskbar() {
+    var tw = document.getElementById('tw');
+    tw.innerHTML = '';
+    for (var k in wins) {
+      var btn = document.createElement('button');
+      btn.className = 'ttb' + (k === activeWinId && !wins[k].minimized ? ' active' : '');
+      btn.textContent = wins[k].title;
+      btn.setAttribute('data-win', k);
+      btn.addEventListener('click', function() {
+        var wid = this.getAttribute('data-win');
+        if (wins[wid].minimized) {
+          wins[wid].el.classList.add('open');
+          wins[wid].minimized = false;
+          focusWin(wid);
+        } else if (activeWinId === wid) {
+          minimizeWin(wid);
+        } else {
+          focusWin(wid);
+        }
+      });
+      tw.appendChild(btn);
+    }
+  }
+
+  /* ===== DRAG ===== */
+  function setupDrag(el, id) {
+    var tb = el.querySelector('.wtb');
+    var dragging = false, sx, sy, ox, oy;
+
+    function down(e) {
+      if (e.target.classList.contains('tb')) return;
+      dragging = true;
+      var pt = e.touches ? e.touches[0] : e;
+      sx = pt.clientX; sy = pt.clientY;
+      ox = el.offsetLeft; oy = el.offsetTop;
+      focusWin(id);
+      e.preventDefault();
+    }
+    function move(e) {
+      if (!dragging) return;
+      var pt = e.touches ? e.touches[0] : e;
+      el.style.left = (ox + pt.clientX - sx) + 'px';
+      el.style.top = (oy + pt.clientY - sy) + 'px';
+      if (wins[id].origRect) wins[id].origRect = null;
+    }
+    function up() { dragging = false; }
+
+    tb.addEventListener('mousedown', down);
+    tb.addEventListener('touchstart', down, { passive: false });
+    document.addEventListener('mousemove', move);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchend', up);
+  }
+
+  /* ===== RESIZE ===== */
+  function setupResize(el, id) {
+    var rh = el.querySelector('.rh');
+    var resizing = false, sx, sy, ow, oh;
+
+    function down(e) {
+      resizing = true;
+      var pt = e.touches ? e.touches[0] : e;
+      sx = pt.clientX; sy = pt.clientY;
+      ow = el.offsetWidth; oh = el.offsetHeight;
+      e.preventDefault(); e.stopPropagation();
+    }
+    function move(e) {
+      if (!resizing) return;
+      var pt = e.touches ? e.touches[0] : e;
+      el.style.width = Math.max(220, ow + pt.clientX - sx) + 'px';
+      el.style.height = Math.max(140, oh + pt.clientY - sy) + 'px';
+      if (wins[id].origRect) wins[id].origRect = null;
+    }
+    function up() { resizing = false; }
+
+    rh.addEventListener('mousedown', down);
+    rh.addEventListener('touchstart', down, { passive: false });
+    document.addEventListener('mousemove', move);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchend', up);
+  }
+
+  /* ===== CONTEXT MENU ===== */
+  function showContextMenu(x, y) {
+    var ctx = document.getElementById('ctx');
+    if (x + 180 > window.innerWidth) x = window.innerWidth - 180;
+    if (y + 200 > window.innerHeight - 34) y = window.innerHeight - 34 - 200;
+    if (y < 0) y = 0;
+    ctx.style.left = x + 'px';
+    ctx.style.top = y + 'px';
+    ctx.classList.add('visible');
+    closeStartMenu();
+  }
+
+  function closeContextMenu() {
+    document.getElementById('ctx').classList.remove('visible');
+  }
+
+  document.getElementById('ctx').addEventListener('click', function(e) {
+    var item = e.target.closest('.ci');
+    if (!item) return;
+    var action = item.getAttribute('data-action');
+    closeContextMenu();
+    if (action === 'about' || action === 'projects' || action === 'contact' || action === 'skills' || action === 'secret') {
+      handleIconOpen(action);
+    } else if (action === 'arrange') {
+      var icons = document.querySelectorAll('.di');
+      var col = 0, row = 0;
+      icons.forEach(function(ic) {
+        ic.style.left = (20 + col * 80) + 'px';
+        ic.style.top = (20 + row * 90) + 'px';
+        row++;
+        if (row > 5) { row = 0; col++; }
+      });
+    } else if (action === 'refresh') {
+      var desk = document.getElementById('desktop');
+      desk.style.opacity = '0.5';
+      setTimeout(function() { desk.style.opacity = '1'; }, 150);
+    } else if (action === 'properties') {
+      showDialog('props-dlg');
+    }
+  });
+
+  /* ===== START MENU ===== */
+  document.getElementById('start-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var sm = document.getElementById('smenu');
+    if (sm.classList.contains('visible')) { closeStartMenu(); }
+    else { sm.classList.add('visible'); document.getElementById('start-btn').classList.add('active'); closeContextMenu(); }
+  });
+
+  function closeStartMenu() {
+    document.getElementById('smenu').classList.remove('visible');
+    document.getElementById('start-btn').classList.remove('active');
+  }
+
+  document.getElementById('smenu').addEventListener('click', function(e) {
+    var item = e.target.closest('.smii');
+    if (!item) return;
+    var action = item.getAttribute('data-action');
+    closeStartMenu();
+    if (action === 'shutdown') {
+      document.getElementById('shutdown').classList.add('visible');
+    } else if (action) {
+      handleIconOpen(action);
+    }
+  });
+
+  /* ===== DIALOG BUTTON WIRING ===== */
+  document.getElementById('recycle-ok').addEventListener('click', function() { closeDialog('recycle-dlg'); });
+  document.getElementById('msg-ok').addEventListener('click', function() { closeDialog('msg-dlg'); });
+  document.getElementById('props-ok').addEventListener('click', function() { closeDialog('props-dlg'); });
+  document.getElementById('props-cancel').addEventListener('click', function() { closeDialog('props-dlg'); });
+  document.getElementById('restart-btn').addEventListener('click', function() { location.reload(); });
+
+  document.getElementById('destruct-cancel').addEventListener('click', function() {
+    closeDialog('destruct-dlg');
+    clearInterval(destructInterval);
+    destructInterval = null;
+  });
+
+  /* ===== SELF-DESTRUCT ===== */
+  function triggerDestruct() {
+    var msg = document.getElementById('destruct-msg');
+    var acts = document.getElementById('destruct-acts');
+    msg.textContent = 'Warning: This computer will self-destruct in 10 seconds.';
+    acts.innerHTML = '<button class="wb" id="destruct-cancel2">Cancel</button>';
+    document.getElementById('destruct-cancel2').addEventListener('click', function() {
+      closeDialog('destruct-dlg');
+      clearInterval(destructInterval);
+      destructInterval = null;
+    });
+    showDialog('destruct-dlg');
+
+    var count = 10;
+    destructInterval = setInterval(function() {
+      count--;
+      if (count > 0) {
+        msg.textContent = 'Warning: This computer will self-destruct in ' + count + ' seconds.';
+      } else {
+        clearInterval(destructInterval);
+        destructInterval = null;
+        msg.innerHTML = '<div class="djk">jk</div>';
+        acts.innerHTML = '<button class="wb" id="destruct-ok2">OK</button>';
+        document.getElementById('destruct-ok2').addEventListener('click', function() { closeDialog('destruct-dlg'); });
+        setTimeout(function() { closeDialog('destruct-dlg'); }, 2500);
+      }
+    }, 1000);
+  }
+
+  /* ===== CLOSE MENUS ON OUTSIDE CLICK ===== */
+  document.addEventListener('mousedown', function(e) {
+    if (!e.target.closest('#ctx')) closeContextMenu();
+    if (!e.target.closest('#smenu') && !e.target.closest('#start-btn')) closeStartMenu();
+  });
+
+  /* ===== INIT ===== */
+  buildDesktop();
+  typeBios(biosLines, 0, 0, document.getElementById('bios-text'));
+
+})();
 </script>
 </body>
 </html>
